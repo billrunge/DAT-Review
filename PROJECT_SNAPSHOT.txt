@@ -1,6 +1,6 @@
 # Project Snapshot
-Generated: 2026-01-23T16:14:52Z
-Commit: 7717771
+Generated: 2026-01-23T22:31:24Z
+Commit: 6cb11c2
 
 ----- BEGIN FILE: assets/css/bar-theme.css -----
 (sha1: afc71031800933e51fcef77aeb0059fc4477257c)
@@ -13,7 +13,8 @@ body{ font-family:var(--font-sans); color:var(--text); background:var(--canvas);
 ----- END FILE: assets/css/bar-theme.css -----
 
 ----- BEGIN FILE: assets/css/base.css -----
-(sha1: 0b8e87006da40ab31d39cff350a11da3aa3326d5)
+(sha1: acb73b9b9733ba120bac96196cc53c31d0936324)
+
 
 /* assets/css/base.css */
 
@@ -41,7 +42,7 @@ body{ font-family:var(--font-sans); color:var(--text); background:var(--canvas);
   --font-sans: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 
   /* ===== Used by Chart.js tooltip ===== */
-  --tooltip-bg: #ffffff; /* light surface chip */
+  --tooltip-bg: #ffffff;
 }
 
 /* ===== CSS Tokens (Dark theme) ===== */
@@ -54,7 +55,6 @@ body{ font-family:var(--font-sans); color:var(--text); background:var(--canvas);
 
   --shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 
-  /* Tooltip should be slightly lighter than page bg for contrast */
   --tooltip-bg: #111827;
 }
 
@@ -106,7 +106,7 @@ label {
   font-weight: 600;
 }
 
-/* Inputs & buttons (tabs may style themselves separately) */
+/* Inputs & buttons */
 input,
 button {
   appearance: none;
@@ -116,10 +116,7 @@ button {
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius);
   cursor: pointer;
-  transition:
-    background 120ms ease,
-    border-color 120ms ease,
-    box-shadow 120ms ease;
+  transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
 }
 
 /* Text inputs */
@@ -128,26 +125,23 @@ input[type="search"] {
   cursor: text;
 }
 
-/* Hover (exclude custom-styled tab buttons) */
 button:hover:not(.team-tab) {
   background: var(--bg-hover);
   border-color: #9ca3af;
 }
 
-/* Accessible focus */
 button:focus-visible,
 input:focus-visible {
   outline: 3px solid color-mix(in oklab, var(--primary) 40%, transparent);
   outline-offset: 2px;
 }
 
-/* Helpful layout niceties */
 .chart-container {
   width: min(100%, 900px);
   margin: 0 auto;
 }
 
-/* ===== Strengths & Training Needs (team) — optional styling ===== */
+/* ===== Strengths & Training Needs ===== */
 .stn-section {
   margin-top: var(--space-5);
 }
@@ -209,18 +203,63 @@ input:focus-visible {
   margin: 0;
 }
 
+/* ================================
+   FLOATING PRINT / PDF BUTTON
+   ================================ */
+.floating-print-btn {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 9999;
+
+  background: var(--brand);
+  border: none;
+  color: #fff;
+
+  width: 48px;        /* Ensures a perfect circle */
+  height: 48px;
+  padding: 0;         /* Remove padding so SVG centers */
+
+  border-radius: 50%;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+  transition: background 0.2s ease, transform 0.2s ease;
+
+  overflow: visible;  /* Avoid clipping in some browsers */
+}
+
+/* Prevent clipping / baseline issues */
+.floating-print-btn svg {
+  width: 22px;
+  height: 22px;
+  display: block;   /* Removes baseline shift */
+}
+
+.floating-print-btn:hover {
+  background: color-mix(in oklab, var(--brand) 85%, #000);
+  transform: scale(1.05);
+}
+
+/* Critical: enforce hidden state */
+.floating-print-btn[hidden] {
+  display: none !important;
+}
+
 /* ===========================
    PRINT / EXPORT TO PDF MODE
    =========================== */
 @media print {
-  /* Remove padding around the body to maximize printable width */
   body {
     padding: 0 !important;
     background: #ffffff !important;
     color: #000 !important;
   }
 
-  /* Show a print-only dynamic header at the very top */
   .print-only-report-header {
     display: block !important;
     font-size: 20px;
@@ -230,7 +269,6 @@ input:focus-visible {
     color: #000 !important;
   }
 
-  /* Hide interactive UI that shouldn't appear in a PDF */
   .controls,
   #respondentCombo,
   #respondentPanel,
@@ -239,11 +277,11 @@ input:focus-visible {
   #chartStatus,
   .combo-panel,
   .team-tabs,
-  .sr-only {
+  .sr-only,
+  .floating-print-btn {
     display: none !important;
   }
 
-  /* Keep charts sharp and full-width */
   .chart-container {
     margin: 0 0 24px 0 !important;
     width: 100% !important;
@@ -254,7 +292,6 @@ input:focus-visible {
     page-break-inside: avoid;
   }
 
-  /* Improve card readability on PDF */
   .qa,
   .stn-block {
     background: #fff !important;
@@ -262,7 +299,6 @@ input:focus-visible {
     box-shadow: none !important;
   }
 
-  /* Page break handling for long reports */
   section,
   .qa,
   .stn-block,
@@ -272,19 +308,16 @@ input:focus-visible {
     margin-bottom: 24px;
   }
 
-  /* Make long text answers more readable */
   .lt-answer {
     white-space: pre-wrap;
     font-size: 14px;
   }
 
-  /* Optional: remove disclosure arrows from Text Answers */
   .lt-summary::before {
     content: "";
   }
 }
 
-/* Hide the print header on screen */
 @media screen {
   .print-only-report-header {
     display: none;
@@ -366,7 +399,7 @@ details[open] .lt-summary::before{ content:"▾"; }
 ----- END FILE: assets/css/score-changes.css -----
 
 ----- BEGIN FILE: assets/js/app.js -----
-(sha1: f581a1f2740e69aafa1dd88b649aef660d474899)
+(sha1: 5edb021a44287a6bab6b774372390097b4e10ae8)
 
 
 import { initCombobox, clearRespondentSelection } from "./ui/combobox.js";
@@ -379,6 +412,10 @@ export async function start() {
   try {
     await initCombobox();
     await loadVerticals();
+
+    // Always start hidden (defensive)
+    const fp = document.getElementById("floatingPrintBtn");
+    if (fp) fp.hidden = true;
 
     els.loadVerticalBtn?.addEventListener("click", () => {
       const active = els.teamBar?.querySelector("button.team-tab.active");
@@ -398,6 +435,10 @@ export async function start() {
         setStatus(`Failed to load team answers: ${e.message}`),
       );
     });
+
+    // Wire floating print button + hidden internal trigger
+    document.getElementById("floatingPrintBtn")?.addEventListener("click", exportPDF);
+    document.getElementById("exportToPDF")?.addEventListener("click", exportPDF);
 
     setStatus("Ready.");
   } catch (e) {
@@ -473,9 +514,6 @@ export function exportPDF() {
     }, 150);
   }, 0);
 }
-
-// Wire hidden button for internal use
-document.getElementById("exportToPDF")?.addEventListener("click", exportPDF);
 
 ----- END FILE: assets/js/app.js -----
 
@@ -627,7 +665,8 @@ export async function fetchJson(url, options, timeoutMs = 30000) {
 ----- END FILE: assets/js/core/http.js -----
 
 ----- BEGIN FILE: assets/js/features/respondentReport.js -----
-(sha1: 2b15723dfbf3b1a067453d96ab2ad3f1d241479c)
+(sha1: 755263e2761410ace93ea47686aa6adb8845c1e1)
+
 
 // assets/js/features/respondentReport.js
 import { els } from "../core/domRefs.js";
@@ -756,6 +795,10 @@ export async function loadRespondentAnswers() {
   await loadRespondentLongTextAnswers(id);
 
   setStatus(`Chart updated. (${rows.length.toLocaleString()} records)`);
+
+  // SHOW floating print button
+  const fp = document.getElementById("floatingPrintBtn");
+  if (fp) fp.hidden = false;
 }
 
 function renderExtremes(rows, series, periods, map) {
@@ -993,7 +1036,7 @@ export async function loadTeamMultiChoiceAnswers(verticalChoiceGuid) {
 ----- END FILE: assets/js/features/teamMultiChoiceAgg.js -----
 
 ----- BEGIN FILE: assets/js/features/verticalReport.js -----
-(sha1: 86ce739daa75b72a9ca3e5ed1f69153db7971484)
+(sha1: ea0d9c1d8af3b51c625f71b6ce3fd46ce2525d39)
 
 
 // assets/js/features/verticalReport.js
@@ -1050,6 +1093,10 @@ function renderTeamButtons(data) {
       setStatus('Choose a respondent or click "Load Vertical Report".');
       // Clear header until a report is actually loaded
       setPrintHeader('');
+
+      // Hide floating button proactively on tab switch
+      const fp = document.getElementById("floatingPrintBtn");
+      if (fp) fp.hidden = true;
     });
 
     container.appendChild(btn);
@@ -1064,6 +1111,9 @@ function renderTeamButtons(data) {
       }
       setStatus('Choose a respondent or click "Load Vertical Report".');
       setPrintHeader('');
+
+      const fp = document.getElementById("floatingPrintBtn");
+      if (fp) fp.hidden = true;
     });
   }
 
@@ -1216,6 +1266,10 @@ export async function loadTeamAnswers(verticalChoice) {
   );
 
   setStatus(`Team chart updated. (${rows.length.toLocaleString()} records)`);
+
+  // SHOW floating print button
+  const fp = document.getElementById("floatingPrintBtn");
+  if (fp) fp.hidden = false;
 }
 
 ----- END FILE: assets/js/features/verticalReport.js -----
@@ -1231,7 +1285,7 @@ start();
 ----- END FILE: assets/js/index.js -----
 
 ----- BEGIN FILE: assets/js/ui/chart.js -----
-(sha1: de983d95cbdb1e32bf80343721e10980ed81bced)
+(sha1: c75fb194638e96dd93caa5ae12fd5a67ec4b296a)
 
 
 // assets/js/ui/chart.js
@@ -1403,6 +1457,10 @@ export function clearReportAreas() {
     document.getElementById('answersChart')?.parentElement;
   if (container) container.hidden = true;
 
+  // Hide floating print button
+  const fp = document.getElementById("floatingPrintBtn");
+  if (fp) fp.hidden = true;
+
   // Also clear Strengths & Training Needs
   try { clearTeamStrengths(); } catch {}
 
@@ -1425,6 +1483,7 @@ export function clearReportAreas() {
   if (exHeader) exHeader.remove();
   if (exSection) exSection.remove();
 }
+
 ----- END FILE: assets/js/ui/chart.js -----
 
 ----- BEGIN FILE: assets/js/ui/combobox.js -----
@@ -2072,7 +2131,7 @@ export const storage = {
 ----- END FILE: assets/js/utils.js -----
 
 ----- BEGIN FILE: index.html -----
-(sha1: 75690eee6d29330c223f3b86dadd6e53fe33df09)
+(sha1: f364e69c6572c2e5403cf1ffa88a5a4840861c6a)
 
 
 <!DOCTYPE html>
@@ -2129,6 +2188,14 @@ export const storage = {
   <main>
     <!-- Print-only dynamic report header (populated at runtime) -->
     <div id="print-report-header" class="print-only-report-header"></div>
+
+    <!-- Floating Print / Export button (shown when a report is loaded) -->
+    <button id="floatingPrintBtn" class="floating-print-btn" hidden title="Print / Export PDF" aria-label="Print / Export PDF">
+      <!-- Minimal print/PDF icon (Option 1) -->
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="white" aria-hidden="true" focusable="false">
+        <path d="M6 2h12v4h4v10h-4v6H6v-6H2V6h4V2zm2 0v4h8V2H8zm8 18v-4H8v4h8zM4 8v6h16V8H4z"/>
+      </svg>
+    </button>
 
     <section aria-labelledby="teams-label">
       <h2 id="teams-label" class="sr-only">Filter by vertical</h2>
