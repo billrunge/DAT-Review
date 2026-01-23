@@ -1,6 +1,6 @@
 # Project Snapshot
-Generated: 2026-01-23T20:38:56Z
-Commit: 853e8db
+Generated: 2026-01-23T20:59:41Z
+Commit: e8b3a15
 
 ----- BEGIN FILE: assets/css/bar-theme.css -----
 (sha1: afc71031800933e51fcef77aeb0059fc4477257c)
@@ -13,7 +13,7 @@ body{ font-family:var(--font-sans); color:var(--text); background:var(--canvas);
 ----- END FILE: assets/css/bar-theme.css -----
 
 ----- BEGIN FILE: assets/css/base.css -----
-(sha1: 2df11024a9c31e9bfae4625249f73a7bdccb2e6c)
+(sha1: 0b8e87006da40ab31d39cff350a11da3aa3326d5)
 
 /* assets/css/base.css */
 
@@ -213,15 +213,20 @@ input:focus-visible {
    PRINT / EXPORT TO PDF MODE
    =========================== */
 @media print {
-  /* Hide disclosure arrows in print output (purely visual) */
-  .lt-summary::before {
-    content: "";
-  }
-
   /* Remove padding around the body to maximize printable width */
   body {
     padding: 0 !important;
     background: #ffffff !important;
+    color: #000 !important;
+  }
+
+  /* Show a print-only dynamic header at the very top */
+  .print-only-report-header {
+    display: block !important;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    text-align: center;
     color: #000 !important;
   }
 
@@ -271,6 +276,18 @@ input:focus-visible {
   .lt-answer {
     white-space: pre-wrap;
     font-size: 14px;
+  }
+
+  /* Optional: remove disclosure arrows from Text Answers */
+  .lt-summary::before {
+    content: "";
+  }
+}
+
+/* Hide the print header on screen */
+@media screen {
+  .print-only-report-header {
+    display: none;
   }
 }
 
@@ -349,17 +366,20 @@ details[open] .lt-summary::before{ content:"▾"; }
 ----- END FILE: assets/css/score-changes.css -----
 
 ----- BEGIN FILE: assets/js/app.js -----
-(sha1: 9aa6b324ed76842e471edbe6a9628991fbedcddf)
+(sha1: f581a1f2740e69aafa1dd88b649aef660d474899)
+
 
 import { initCombobox, clearRespondentSelection } from "./ui/combobox.js";
 import { loadVerticals, loadTeamAnswers } from "./features/verticalReport.js";
 import { els } from "./core/domRefs.js";
 import { setStatus } from "./utils.js";
 import { clearReportAreas } from "./ui/chart.js";
+
 export async function start() {
   try {
     await initCombobox();
     await loadVerticals();
+
     els.loadVerticalBtn?.addEventListener("click", () => {
       const active = els.teamBar?.querySelector("button.team-tab.active");
       if (!active || !active.dataset.choiceGuid) {
@@ -378,31 +398,36 @@ export async function start() {
         setStatus(`Failed to load team answers: ${e.message}`),
       );
     });
+
     setStatus("Ready.");
   } catch (e) {
     setStatus(`Initialization failed: ${e.message}`);
   }
 }
 
+/** Sets the print-only dynamic header text shown in exported PDFs. */
+export function setPrintHeader(text) {
+  const el = document.getElementById("print-report-header");
+  if (el) el.textContent = text || "";
+}
+
 // Expose global PDF export (can be called by browser bookmarklet or console)
 export function exportPDF() {
-  // Keep track of original open/closed states so we can restore them after print
+  // Keep track of original open/closed states so we can restore after print
   const originalStates = [];
 
   const expandLongText = () => {
-    // Ensure section exists (your loader already creates it, but this is safe if not loaded)
     const items = document.querySelectorAll('#longtext-section details.lt-item');
-    originalStates.length = 0; // reset
+    originalStates.length = 0;
     items.forEach((d) => {
       originalStates.push({ el: d, wasOpen: d.open === true });
-      d.open = true; // force open
+      d.open = true; // force open for print
     });
   };
 
   const restoreLongText = () => {
     if (originalStates.length) {
       for (const { el, wasOpen } of originalStates) {
-        // restore original state
         el.open = wasOpen;
       }
       originalStates.length = 0;
@@ -433,27 +458,21 @@ export function exportPDF() {
   window.addEventListener('afterprint', onAfterPrint);
   if (window.matchMedia) {
     mq = window.matchMedia('print');
-    // Not all browsers support addEventListener on MediaQueryList in legacy mode
     try {
       mq.addEventListener('change', onMediaChange);
     } catch {
-      // Best effort; before/afterprint should still handle most cases
+      // Best effort; before/afterprint will handle most cases
     }
   }
 
-  // Let Chart.js animations settle, then print
+  // Let Chart.js animations settle, expand proactively, then print
   setTimeout(() => {
-    // Proactively expand in case beforeprint doesn’t fire (some headless/edge cases)
     expandLongText();
-
-    // Small delay to ensure DOM updates are flushed
     setTimeout(() => {
       window.print();
     }, 150);
   }, 0);
 }
-``
-
 
 // Wire hidden button for internal use
 document.getElementById("exportToPDF")?.addEventListener("click", exportPDF);
@@ -608,20 +627,25 @@ export async function fetchJson(url, options, timeoutMs = 30000) {
 ----- END FILE: assets/js/core/http.js -----
 
 ----- BEGIN FILE: assets/js/features/respondentReport.js -----
-(sha1: 9dfb6bd1be371ab4d92167d30a9f8f9fcde85637)
-
+(sha1: 2b15723dfbf3b1a067453d96ab2ad3f1d241479c)
 
 // assets/js/features/respondentReport.js
 import { els } from "../core/domRefs.js";
 import { GUIDS } from "../core/constants.js";
 import { fetchAllQuerySlim } from "../core/graph.js";
 import { getWorkspaceId } from "../core/config.js";
-import { mapAnswer, normalizeQuestion, setStatus, compareDatNames } from "../utils.js";
+import {
+  mapAnswer,
+  normalizeQuestion,
+  setStatus,
+  compareDatNames,
+} from "../utils.js";
 import { replaceChartData } from "../ui/chart.js";
 import { loadRespondentMultiChoiceAnswers } from "../ui/multiChoice.js";
 import { loadRespondentLongTextAnswers } from "../ui/longText.js";
 import { renderScoreChanges } from "../ui/scoreChanges.js";
 import { getSelectedRespondentId } from "../ui/combobox.js";
+import { setPrintHeader } from "../app.js";
 
 export async function loadRespondentAnswers() {
   if (els.mcSection) els.mcSection.hidden = true;
@@ -637,6 +661,15 @@ export async function loadRespondentAnswers() {
     return;
   }
 
+  // Set the dynamic print header with respondent + active vertical (if present)
+  const respondentName = els.input?.value || "Selected respondent";
+  const activeTab = els.teamBar?.querySelector("button.team-tab.active");
+  const verticalName = activeTab?.dataset?.label || "";
+  const header = verticalName
+    ? `${respondentName} — ${verticalName}`
+    : `${respondentName}`;
+  setPrintHeader(header);
+
   setStatus("Loading respondent chart…");
   const ws = getWorkspaceId();
 
@@ -644,10 +677,10 @@ export async function loadRespondentAnswers() {
     Request: {
       ObjectType: { GUID: GUIDS.ANSWER_OBJ },
       fields: [
-        { GUID: GUIDS.QUESTION_ID },   // [0]
+        { GUID: GUIDS.QUESTION_ID }, // [0]
         { GUID: GUIDS.SINGLE_CHOICE }, // [1]
-        { GUID: GUIDS.DAT },           // [2]
-        { GUID: GUIDS.YES_NO },        // [3]
+        { GUID: GUIDS.DAT }, // [2]
+        { GUID: GUIDS.YES_NO }, // [3]
         { GUID: GUIDS.QUESTION_TEXT }, // [4]
       ],
       condition:
@@ -661,7 +694,7 @@ export async function loadRespondentAnswers() {
   const rows = await fetchAllQuerySlim(ws, base, 1000);
 
   const periods = Array.from(
-    new Set(rows.map((r) => r.Values?.[2]?.Name).filter(Boolean))
+    new Set(rows.map((r) => r.Values?.[2]?.Name).filter(Boolean)),
   );
   periods.sort(compareDatNames);
   const earliest = periods[0];
@@ -683,14 +716,14 @@ export async function loadRespondentAnswers() {
   });
 
   const eligible = Object.keys(series).filter((q) =>
-    periods.every((p) => series[q][p] !== undefined)
+    periods.every((p) => series[q][p] !== undefined),
   );
 
   const totals = periods.map((p) =>
     eligible.reduce((s, q) => {
       const v = series[q][p];
       return Number.isFinite(v) ? s + v : s;
-    }, 0)
+    }, 0),
   );
 
   replaceChartData(periods, totals);
@@ -714,7 +747,7 @@ export async function loadRespondentAnswers() {
     changes.filter((c) => c.delta < 0).sort((a, b) => a.delta - b.delta),
     earliest,
     latest,
-    5
+    5,
   );
 
   renderExtremes(rows, series, periods, qTextMap);
@@ -960,7 +993,7 @@ export async function loadTeamMultiChoiceAnswers(verticalChoiceGuid) {
 ----- END FILE: assets/js/features/teamMultiChoiceAgg.js -----
 
 ----- BEGIN FILE: assets/js/features/verticalReport.js -----
-(sha1: f9dfcc5d8cfa2b645f2df66903e0f2dcd7da00a0)
+(sha1: 86ce739daa75b72a9ca3e5ed1f69153db7971484)
 
 
 // assets/js/features/verticalReport.js
@@ -974,6 +1007,7 @@ import { replaceChartData, clearReportAreas } from '../ui/chart.js';
 import { renderScoreChanges } from '../ui/scoreChanges.js';
 import { reloadRespondentsForVertical } from '../ui/combobox.js';
 import { renderTeamStrengths } from '../ui/teamStrengths.js';
+import { setPrintHeader } from '../app.js';
 
 export async function loadVerticals() {
   const wsId = getWorkspaceId();
@@ -1014,6 +1048,8 @@ function renderTeamButtons(data) {
         await reloadRespondentsForVertical(btn.dataset.choiceGuid);
       }
       setStatus('Choose a respondent or click "Load Vertical Report".');
+      // Clear header until a report is actually loaded
+      setPrintHeader('');
     });
 
     container.appendChild(btn);
@@ -1027,6 +1063,7 @@ function renderTeamButtons(data) {
         await reloadRespondentsForVertical(first.dataset.choiceGuid);
       }
       setStatus('Choose a respondent or click "Load Vertical Report".');
+      setPrintHeader('');
     });
   }
 
@@ -1054,6 +1091,13 @@ export async function loadTeamAnswers(verticalChoice) {
   if (els.mcSection) els.mcSection.hidden = true;
 
   setStatus(`Loading team answers for ${verticalChoice?.name ?? 'selected vertical'}…`);
+
+  // Set the dynamic print header for vertical reports
+  if (verticalChoice?.name) {
+    setPrintHeader(`${verticalChoice.name}`);
+  } else {
+    setPrintHeader('Vertical Report');
+  }
 
   const wsId = getWorkspaceId();
   const base = {
@@ -1173,6 +1217,7 @@ export async function loadTeamAnswers(verticalChoice) {
 
   setStatus(`Team chart updated. (${rows.length.toLocaleString()} records)`);
 }
+
 ----- END FILE: assets/js/features/verticalReport.js -----
 
 ----- BEGIN FILE: assets/js/index.js -----
@@ -2027,7 +2072,8 @@ export const storage = {
 ----- END FILE: assets/js/utils.js -----
 
 ----- BEGIN FILE: index.html -----
-(sha1: b07ccc894b5840b189ef08b06b8fb55b530674cf)
+(sha1: 75690eee6d29330c223f3b86dadd6e53fe33df09)
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -2035,7 +2081,7 @@ export const storage = {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Answers Over Time</title>
+  <title>DAT Review Report</title>
 
   <link rel="stylesheet" href="assets/css/base.css" />
   <link rel="stylesheet" href="assets/css/bar-theme.css" />
@@ -2069,7 +2115,10 @@ export const storage = {
       background-color: transparent !important;
     }
   </style>
+
+  <!-- Hidden trigger button for export (wired in app.js) -->
   <button id="exportToPDF" class="sr-only" aria-hidden="true">Export PDF</button>
+
   <!-- Consider pinning Chart.js to a specific version in production -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script type="module" src="assets/js/index.js"></script>
@@ -2078,6 +2127,9 @@ export const storage = {
 <body>
 
   <main>
+    <!-- Print-only dynamic report header (populated at runtime) -->
+    <div id="print-report-header" class="print-only-report-header"></div>
+
     <section aria-labelledby="teams-label">
       <h2 id="teams-label" class="sr-only">Filter by vertical</h2>
       <div id="team-button-bar" class="team-tabs" role="tablist" aria-label="Verticals"></div>
@@ -2116,6 +2168,7 @@ export const storage = {
 </body>
 
 </html>
+
 ----- END FILE: index.html -----
 
 ## Included files
