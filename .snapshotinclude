@@ -1,0 +1,27 @@
+# Include all HTML, CSS, JS
+*.html
+*.css
+*.js
+
+# Common project folders
+# src/**/*.js
+# src/**/*.ts
+# public/**/*.*
+# data/**/*.*
+# charts/**/*.*
+assets/**/*.*
+# scripts/**/*.*
+# styles/**/*.*
+
+# Exclude things we don't want in the snapshot
+!node_modules/**
+!.git/**
+!dist/**
+!build/**
+!*.png
+!*.jpg
+!*.jpeg
+!*.gif
+!*.webp
+!*.zip
+!*.pdf

@@ -1,0 +1,67 @@
+
+name: Build Project Snapshot
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate PROJECT_SNAPSHOT.txt
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          SNAP="PROJECT_SNAPSHOT.txt"
+          INCLUDE=".snapshotinclude"
+
+          echo "# Project Snapshot" > "$SNAP"
+          echo "Generated: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "$SNAP"
+          echo "Commit: $(git rev-parse --short HEAD)" >> "$SNAP"
+          echo >> "$SNAP"
+
+          # Gather files matching the include patterns
+          files=$(git ls-files $(tr '\n' ' ' < "$INCLUDE"))
+
+          # Filter out binaries based on extension
+          skip_ext="png|jpg|jpeg|gif|webp|pdf|zip|gz|7z|mp4|mp3|woff|woff2|ttf|eot"
+          filtered=""
+          while IFS= read -r f; do
+            if [[ ! "$f" =~ \.($skip_ext)$ ]] && [[ -f "$f" ]]; then
+              filtered+="$f"$'\n'
+            fi
+          done <<< "$files"
+
+          # Concatenate into snapshot
+          while IFS= read -r f; do
+            echo "----- BEGIN FILE: $f -----" >> "$SNAP"
+            echo "(sha1: $(git hash-object "$f"))" >> "$SNAP"
+            echo >> "$SNAP"
+            sed -n '1,4000p' "$f" >> "$SNAP"
+            echo >> "$SNAP"
+            echo "----- END FILE: $f -----" >> "$SNAP"
+            echo >> "$SNAP"
+          done <<< "$filtered"
+
+          echo "## Included files" >> "$SNAP"
+          echo "$filtered" >> "$SNAP"
+
+      - name: Commit snapshot if changed
+        run: |
+          if [[ -n $(git status --porcelain PROJECT_SNAPSHOT.txt) ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add PROJECT_SNAPSHOT.txt
+            git commit -m "Update PROJECT_SNAPSHOT.txt"
+            git push
+          else
+            echo "No changes detected"
+          fi
