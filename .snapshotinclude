@@ -32,6 +32,12 @@ data/**/*.csv
 data/**/*.tsv
 assets/**/*.svg
 
+
+# Exclude the old theme helper
+!assets/js/theme.js
+
+
+
 # -----------------------------------------------------------------------------
 # NOTE:
 # We don't need explicit "exclusions" here; the workflow filters binaries by
