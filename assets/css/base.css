@@ -196,15 +196,20 @@ input:focus-visible {
    PRINT / EXPORT TO PDF MODE
    =========================== */
 @media print {
-  /* Hide disclosure arrows in print output (purely visual) */
-  .lt-summary::before {
-    content: "";
-  }
-
   /* Remove padding around the body to maximize printable width */
   body {
     padding: 0 !important;
     background: #ffffff !important;
+    color: #000 !important;
+  }
+
+  /* Show a print-only dynamic header at the very top */
+  .print-only-report-header {
+    display: block !important;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    text-align: center;
     color: #000 !important;
   }
 
@@ -254,5 +259,17 @@ input:focus-visible {
   .lt-answer {
     white-space: pre-wrap;
     font-size: 14px;
+  }
+
+  /* Optional: remove disclosure arrows from Text Answers */
+  .lt-summary::before {
+    content: "";
+  }
+}
+
+/* Hide the print header on screen */
+@media screen {
+  .print-only-report-header {
+    display: none;
   }
 }

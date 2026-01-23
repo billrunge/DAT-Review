@@ -1,15 +1,20 @@
-
 // assets/js/features/respondentReport.js
 import { els } from "../core/domRefs.js";
 import { GUIDS } from "../core/constants.js";
 import { fetchAllQuerySlim } from "../core/graph.js";
 import { getWorkspaceId } from "../core/config.js";
-import { mapAnswer, normalizeQuestion, setStatus, compareDatNames } from "../utils.js";
+import {
+  mapAnswer,
+  normalizeQuestion,
+  setStatus,
+  compareDatNames,
+} from "../utils.js";
 import { replaceChartData } from "../ui/chart.js";
 import { loadRespondentMultiChoiceAnswers } from "../ui/multiChoice.js";
 import { loadRespondentLongTextAnswers } from "../ui/longText.js";
 import { renderScoreChanges } from "../ui/scoreChanges.js";
 import { getSelectedRespondentId } from "../ui/combobox.js";
+import { setPrintHeader } from "../app.js";
 
 export async function loadRespondentAnswers() {
   if (els.mcSection) els.mcSection.hidden = true;
@@ -25,6 +30,15 @@ export async function loadRespondentAnswers() {
     return;
   }
 
+  // Set the dynamic print header with respondent + active vertical (if present)
+  const respondentName = els.input?.value || "Selected respondent";
+  const activeTab = els.teamBar?.querySelector("button.team-tab.active");
+  const verticalName = activeTab?.dataset?.label || "";
+  const header = verticalName
+    ? `${respondentName} — ${verticalName}`
+    : `${respondentName}`;
+  setPrintHeader(header);
+
   setStatus("Loading respondent chart…");
   const ws = getWorkspaceId();
 
@@ -32,10 +46,10 @@ export async function loadRespondentAnswers() {
     Request: {
       ObjectType: { GUID: GUIDS.ANSWER_OBJ },
       fields: [
-        { GUID: GUIDS.QUESTION_ID },   // [0]
+        { GUID: GUIDS.QUESTION_ID }, // [0]
         { GUID: GUIDS.SINGLE_CHOICE }, // [1]
-        { GUID: GUIDS.DAT },           // [2]
-        { GUID: GUIDS.YES_NO },        // [3]
+        { GUID: GUIDS.DAT }, // [2]
+        { GUID: GUIDS.YES_NO }, // [3]
         { GUID: GUIDS.QUESTION_TEXT }, // [4]
       ],
       condition:
@@ -49,7 +63,7 @@ export async function loadRespondentAnswers() {
   const rows = await fetchAllQuerySlim(ws, base, 1000);
 
   const periods = Array.from(
-    new Set(rows.map((r) => r.Values?.[2]?.Name).filter(Boolean))
+    new Set(rows.map((r) => r.Values?.[2]?.Name).filter(Boolean)),
   );
   periods.sort(compareDatNames);
   const earliest = periods[0];
@@ -71,14 +85,14 @@ export async function loadRespondentAnswers() {
   });
 
   const eligible = Object.keys(series).filter((q) =>
-    periods.every((p) => series[q][p] !== undefined)
+    periods.every((p) => series[q][p] !== undefined),
   );
 
   const totals = periods.map((p) =>
     eligible.reduce((s, q) => {
       const v = series[q][p];
       return Number.isFinite(v) ? s + v : s;
-    }, 0)
+    }, 0),
   );
 
   replaceChartData(periods, totals);
@@ -102,7 +116,7 @@ export async function loadRespondentAnswers() {
     changes.filter((c) => c.delta < 0).sort((a, b) => a.delta - b.delta),
     earliest,
     latest,
-    5
+    5,
   );
 
   renderExtremes(rows, series, periods, qTextMap);

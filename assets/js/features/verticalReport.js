@@ -10,6 +10,7 @@ import { replaceChartData, clearReportAreas } from '../ui/chart.js';
 import { renderScoreChanges } from '../ui/scoreChanges.js';
 import { reloadRespondentsForVertical } from '../ui/combobox.js';
 import { renderTeamStrengths } from '../ui/teamStrengths.js';
+import { setPrintHeader } from '../app.js';
 
 export async function loadVerticals() {
   const wsId = getWorkspaceId();
@@ -50,6 +51,8 @@ function renderTeamButtons(data) {
         await reloadRespondentsForVertical(btn.dataset.choiceGuid);
       }
       setStatus('Choose a respondent or click "Load Vertical Report".');
+      // Clear header until a report is actually loaded
+      setPrintHeader('');
     });
 
     container.appendChild(btn);
@@ -63,6 +66,7 @@ function renderTeamButtons(data) {
         await reloadRespondentsForVertical(first.dataset.choiceGuid);
       }
       setStatus('Choose a respondent or click "Load Vertical Report".');
+      setPrintHeader('');
     });
   }
 
@@ -90,6 +94,13 @@ export async function loadTeamAnswers(verticalChoice) {
   if (els.mcSection) els.mcSection.hidden = true;
 
   setStatus(`Loading team answers for ${verticalChoice?.name ?? 'selected vertical'}…`);
+
+  // Set the dynamic print header for vertical reports
+  if (verticalChoice?.name) {
+    setPrintHeader(`${verticalChoice.name}`);
+  } else {
+    setPrintHeader('Vertical Report');
+  }
 
   const wsId = getWorkspaceId();
   const base = {

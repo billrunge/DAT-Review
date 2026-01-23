@@ -1,12 +1,15 @@
+
 import { initCombobox, clearRespondentSelection } from "./ui/combobox.js";
 import { loadVerticals, loadTeamAnswers } from "./features/verticalReport.js";
 import { els } from "./core/domRefs.js";
 import { setStatus } from "./utils.js";
 import { clearReportAreas } from "./ui/chart.js";
+
 export async function start() {
   try {
     await initCombobox();
     await loadVerticals();
+
     els.loadVerticalBtn?.addEventListener("click", () => {
       const active = els.teamBar?.querySelector("button.team-tab.active");
       if (!active || !active.dataset.choiceGuid) {
@@ -25,31 +28,36 @@ export async function start() {
         setStatus(`Failed to load team answers: ${e.message}`),
       );
     });
+
     setStatus("Ready.");
   } catch (e) {
     setStatus(`Initialization failed: ${e.message}`);
   }
 }
 
+/** Sets the print-only dynamic header text shown in exported PDFs. */
+export function setPrintHeader(text) {
+  const el = document.getElementById("print-report-header");
+  if (el) el.textContent = text || "";
+}
+
 // Expose global PDF export (can be called by browser bookmarklet or console)
 export function exportPDF() {
-  // Keep track of original open/closed states so we can restore them after print
+  // Keep track of original open/closed states so we can restore after print
   const originalStates = [];
 
   const expandLongText = () => {
-    // Ensure section exists (your loader already creates it, but this is safe if not loaded)
     const items = document.querySelectorAll('#longtext-section details.lt-item');
-    originalStates.length = 0; // reset
+    originalStates.length = 0;
     items.forEach((d) => {
       originalStates.push({ el: d, wasOpen: d.open === true });
-      d.open = true; // force open
+      d.open = true; // force open for print
     });
   };
 
   const restoreLongText = () => {
     if (originalStates.length) {
       for (const { el, wasOpen } of originalStates) {
-        // restore original state
         el.open = wasOpen;
       }
       originalStates.length = 0;
@@ -80,27 +88,21 @@ export function exportPDF() {
   window.addEventListener('afterprint', onAfterPrint);
   if (window.matchMedia) {
     mq = window.matchMedia('print');
-    // Not all browsers support addEventListener on MediaQueryList in legacy mode
     try {
       mq.addEventListener('change', onMediaChange);
     } catch {
-      // Best effort; before/afterprint should still handle most cases
+      // Best effort; before/afterprint will handle most cases
     }
   }
 
-  // Let Chart.js animations settle, then print
+  // Let Chart.js animations settle, expand proactively, then print
   setTimeout(() => {
-    // Proactively expand in case beforeprint doesn’t fire (some headless/edge cases)
     expandLongText();
-
-    // Small delay to ensure DOM updates are flushed
     setTimeout(() => {
       window.print();
     }, 150);
   }, 0);
 }
-``
-
 
 // Wire hidden button for internal use
 document.getElementById("exportToPDF")?.addEventListener("click", exportPDF);
