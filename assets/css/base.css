@@ -196,6 +196,11 @@ input:focus-visible {
    PRINT / EXPORT TO PDF MODE
    =========================== */
 @media print {
+  /* Hide disclosure arrows in print output (purely visual) */
+  .lt-summary::before {
+    content: "";
+  }
+
   /* Remove padding around the body to maximize printable width */
   body {
     padding: 0 !important;
