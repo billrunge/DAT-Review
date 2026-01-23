@@ -6,6 +6,11 @@ on:
   push:
     branches: [ main ]
 
+# 👇 Add this block
+permissions:
+  contents: write   # required to push PROJECT_SNAPSHOT.txt
+
+
 jobs:
   snapshot:
     runs-on: ubuntu-latest
