@@ -1,6 +1,6 @@
 # Project Snapshot
-Generated: 2026-01-23T15:41:21Z
-Commit: 026e3de
+Generated: 2026-01-23T15:55:10Z
+Commit: 724c526
 
 ----- BEGIN FILE: assets/css/bar-theme.css -----
 (sha1: afc71031800933e51fcef77aeb0059fc4477257c)
@@ -430,104 +430,134 @@ export async function fetchJson(url, options, timeoutMs = 30000) {
 ----- END FILE: assets/js/core/http.js -----
 
 ----- BEGIN FILE: assets/js/features/respondentReport.js -----
-(sha1: e95fd3ff69476b62e63cc0bc2895ad9cec73d55b)
+(sha1: e5c2df4fd316a318846e8f461ab2a11049a14cf7)
+
 
 import { els } from "../core/domRefs.js";
 import { GUIDS } from "../core/constants.js";
 import { fetchAllQuerySlim } from "../core/graph.js";
 import { getWorkspaceId } from "../core/config.js";
-import { mapAnswer, normalizeQuestion, setStatus } from "../utils.js";
+import { mapAnswer, normalizeQuestion, setStatus, compareDatNames } from "../utils.js";
 import { replaceChartData } from "../ui/chart.js";
 import { loadRespondentMultiChoiceAnswers } from "../ui/multiChoice.js";
 import { loadRespondentLongTextAnswers } from "../ui/longText.js";
 import { renderScoreChanges } from "../ui/scoreChanges.js";
 import { getSelectedRespondentId } from "../ui/combobox.js";
+
 export async function loadRespondentAnswers() {
+  // Hide/clear ancillary sections up front
   if (els.mcSection) els.mcSection.hidden = true;
   const sc = document.getElementById("score-change-section");
   if (sc) sc.hidden = true;
   const lt = document.getElementById("longtext-section");
   if (lt) lt.hidden = true;
   if (els.pageHeader) els.pageHeader.hidden = true;
+
   const id = getSelectedRespondentId();
   if (!id) {
     setStatus("Please choose a respondent.");
     els.input.focus();
     return;
   }
+
   setStatus("Loading respondent chart…");
   const ws = getWorkspaceId();
+
+  // ✅ FIXED: add parentheses so OR doesn’t escape the Respondent filter
   const base = {
     Request: {
       ObjectType: { GUID: GUIDS.ANSWER_OBJ },
       fields: [
-        { GUID: GUIDS.QUESTION_ID },
-        { GUID: GUIDS.SINGLE_CHOICE },
-        { GUID: GUIDS.DAT },
-        { GUID: GUIDS.YES_NO },
-        { GUID: GUIDS.QUESTION_TEXT },
+        { GUID: GUIDS.QUESTION_ID },   // [0]
+        { GUID: GUIDS.SINGLE_CHOICE }, // [1]
+        { GUID: GUIDS.DAT },           // [2]
+        { GUID: GUIDS.YES_NO },        // [3]
+        { GUID: GUIDS.QUESTION_TEXT }, // [4]
       ],
       condition:
-        `'Respondent' IN OBJECT [${id}] AND ` +
+        `('Respondent' IN OBJECT [${id}] AND (` +
         `'Question::Answer Type' == CHOICE ${GUIDS.TYPE_SINGLE} ` +
-        `OR 'Question::Answer Type' == CHOICE ${GUIDS.TYPE_YESNO}`,
+        `OR 'Question::Answer Type' == CHOICE ${GUIDS.TYPE_YESNO}))`,
       sorts: [{ Direction: "Ascending", FieldIdentifier: { GUID: GUIDS.DAT } }],
     },
   };
+
   const rows = await fetchAllQuerySlim(ws, base, 1000);
-  const periods = [
-    ...new Set(rows.map((r) => r.Values?.[2]?.Name).filter(Boolean)),
-  ];
+
+  // Build and **sort** DAT periods (robust to server sort quirks)
+  const periods = Array.from(
+    new Set(rows.map((r) => r.Values?.[2]?.Name).filter(Boolean))
+  );
+  periods.sort(compareDatNames);
   const earliest = periods[0];
   const latest = periods[periods.length - 1];
-  const series = {},
-    qTextMap = {};
+
+  // Build series: per-question per-period values
+  const series = {};
+  const qTextMap = {};
+
   rows.forEach((r) => {
     const q = r.Values?.[0]?.Name;
     const qt = normalizeQuestion(r.Values?.[4]?.Name ?? r.Values?.[4] ?? q);
     const p = r.Values?.[2]?.Name;
     const raw = r?.Values?.[1]?.Name ?? r?.Values?.[3]?.Name ?? 0;
+
     if (!q || !p) return;
     series[q] ??= {};
     series[q][p] = mapAnswer(raw);
     if (qt && !qTextMap[q]) qTextMap[q] = qt;
   });
+
+  // Only include questions that have values for every period
   const eligible = Object.keys(series).filter((q) =>
-    periods.every((p) => series[q][p] !== undefined),
+    periods.every((p) => series[q][p] !== undefined)
   );
+
+  // Totals per period across fully covered questions
   const totals = periods.map((p) =>
     eligible.reduce((s, q) => {
       const v = series[q][p];
       return Number.isFinite(v) ? s + v : s;
-    }, 0),
+    }, 0)
   );
+
   replaceChartData(periods, totals);
+
+  // Build per-question deltas (earliest → latest)
   const changes = [];
   Object.keys(series).forEach((q) => {
-    const f = series[q][earliest];
-    const t = series[q][latest];
-    if (!Number.isFinite(f) || !Number.isFinite(t)) return;
+    const from = series[q][earliest];
+    const to = series[q][latest];
+    if (!Number.isFinite(from) || !Number.isFinite(to)) return;
     changes.push({
       qId: q,
       qText: qTextMap[q] ?? q,
-      from: f,
-      to: t,
-      delta: t - f,
+      from,
+      to,
+      delta: to - from,
     });
   });
+
   renderScoreChanges(
     changes.filter((c) => c.delta > 0).sort((a, b) => b.delta - a.delta),
     changes.filter((c) => c.delta < 0).sort((a, b) => a.delta - b.delta),
     earliest,
     latest,
-    5,
+    5
   );
+
+  // Strengths/needs at the respondent level
   renderExtremes(rows, series, periods, qTextMap);
+
+  // Detail sections
   await loadRespondentMultiChoiceAnswers(id);
   await loadRespondentLongTextAnswers(id);
+
   setStatus(`Chart updated. (${rows.length.toLocaleString()} records)`);
 }
+
 function renderExtremes(rows, series, periods, map) {
+  // Identify questions that are purely SingleChoice (exclude Yes/No)
   const types = new Map();
   rows.forEach((r) => {
     const q = r.Values?.[0]?.Name;
@@ -539,11 +569,13 @@ function renderExtremes(rows, series, periods, map) {
     if (y) t.yesno = true;
     types.set(q, t);
   });
-  const sc = [...types.entries()]
+
+  const onlySingle = [...types.entries()]
     .filter(([, t]) => t.single === true && t.yesno !== true)
     .map(([q]) => q);
+
   const out = [];
-  sc.forEach((q) => {
+  onlySingle.forEach((q) => {
     const vals = periods
       .map((p) => series[q]?.[p])
       .filter((v) => Number.isFinite(v));
@@ -551,53 +583,70 @@ function renderExtremes(rows, series, periods, map) {
     const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
     out.push({ qId: q, qText: map[q] ?? q, avg });
   });
+
   if (!out.length) return;
+
   out.sort((a, b) => a.avg - b.avg);
   const lowest = out.slice(0, 5);
   const highest = out.slice(-5).reverse();
+
   const anchor =
     document.getElementById("score-change-section") || els.mcSection;
   const parent = anchor?.parentNode || document.body;
-  const prevS = document.getElementById("extremes-section");
-  const prevH = document.getElementById("extremes-section-header");
-  if (prevS) prevS.remove();
-  if (prevH) prevH.remove();
+
+  // Clear previous
+  document.getElementById("extremes-section")?.remove();
+  document.getElementById("extremes-section-header")?.remove();
+
+  // Header
   const header = document.createElement("h3");
   header.id = "extremes-section-header";
   header.textContent = "Respondent Strengths & Training Needs";
+
+  // Card
   const card = document.createElement("section");
   card.id = "extremes-section";
   card.className = "qa";
+
   const make = (t, items, up) => {
     const h3 = document.createElement("h3");
     h3.textContent = t;
     card.appendChild(h3);
+
     const ul = document.createElement("ul");
     items.forEach((it) => {
       const li = document.createElement("li");
       const row = document.createElement("div");
       row.className = "sc-row";
+
       const q = document.createElement("span");
       q.className = "sc-question";
       q.textContent = it.qText;
+
       const b = document.createElement("span");
       b.className = `sc-badge ${up ? "sc-up" : "sc-down"}`;
+
       const strong = document.createElement("strong");
       strong.textContent = it.avg.toFixed(2);
+
       const sub = document.createElement("span");
       sub.className = "sc-sub";
       sub.textContent = " avg";
+
       b.appendChild(strong);
       b.appendChild(sub);
       row.appendChild(q);
       row.appendChild(b);
+
       li.appendChild(row);
       ul.appendChild(li);
     });
     card.appendChild(ul);
   };
+
   make("Needs More Training (Lowest)", lowest, false);
   make("Confident / Potential SME (Highest)", highest, true);
+
   if (anchor) {
     parent.insertBefore(header, anchor.nextSibling);
     parent.insertBefore(card, header.nextSibling);
@@ -1543,66 +1592,87 @@ export async function loadRespondentMultiChoiceAnswers(id) {
 ----- END FILE: assets/js/ui/multiChoice.js -----
 
 ----- BEGIN FILE: assets/js/ui/scoreChanges.js -----
-(sha1: d493137da10ada63a8548f394e66c4c658c0c0e5)
+(sha1: 6d7e31efa3930b941733e4230989a12ca147137f)
+
 
 import { els } from "../core/domRefs.js";
+
 function ensure() {
   if (document.getElementById("score-change-section")) return;
   const s = document.createElement("section");
   s.id = "score-change-section";
   s.setAttribute("aria-labelledby", "score-change-label");
   s.hidden = true;
+
   const c = document.createElement("div");
   c.id = "score-change-list";
   s.appendChild(c);
+
   const mc = els.mcSection;
   if (mc && mc.parentNode) mc.parentNode.insertBefore(s, mc.nextSibling);
   else document.body.appendChild(s);
 }
+
 export function renderScoreChanges(inc, dec, earliest, latest, topN = 5) {
   ensure();
+
   const s = document.getElementById("score-change-section");
   const m = document.getElementById("score-change-list");
   m.innerHTML = "";
+
   const hasI = Array.isArray(inc) && inc.length > 0;
   const hasD = Array.isArray(dec) && dec.length > 0;
+
   if (!hasI && !hasD) {
     s.hidden = true;
     return;
   }
-  function add(t, items) {
+
+  function add(title, items) {
     const h = document.createElement("h3");
-    h.textContent = `${t} (${earliest} → ${latest})`;
+    h.textContent = `${title} (${earliest} → ${latest})`;
     m.appendChild(h);
+
     const card = document.createElement("div");
     card.className = "qa";
+
     const ul = document.createElement("ul");
     items.forEach((it) => {
       const li = document.createElement("li");
+
       const row = document.createElement("div");
       row.className = "sc-row";
+
       const q = document.createElement("span");
       q.className = "sc-question";
       q.textContent = it.qText;
+
       const b = document.createElement("span");
       b.className = `sc-badge ${it.delta > 0 ? "sc-up" : "sc-down"}`;
+
       const strong = document.createElement("strong");
       strong.textContent = it.delta > 0 ? `+${it.delta}` : `${it.delta}`;
+
       const sub = document.createElement("span");
       sub.className = "sc-sub";
       sub.textContent = ` (${it.from} → ${it.to})`;
+
       b.appendChild(strong);
       b.appendChild(sub);
       row.appendChild(q);
       row.appendChild(b);
+
       li.appendChild(row);
       ul.appendChild(li);
     });
+
     card.appendChild(ul);
     m.appendChild(card);
   }
-  if (hasI) add("Noteable increases", inc.slice(0, topN));
-  if (hasD) add("Noteable decreases", dec);
+
+  if (hasI) add("Notable increases", inc.slice(0, topN));
+  if (hasD) add("Notable decreases", dec.slice(0, topN));
+
   s.hidden = false;
 }
 
@@ -1766,78 +1836,84 @@ export function clearTeamStrengths() {
 ----- END FILE: assets/js/ui/teamStrengths.js -----
 
 ----- BEGIN FILE: assets/js/utils.js -----
-(sha1: 89a2d5c13a94a183e2dbfdb2d1cac972596d59c0)
+(sha1: feba5093b5848ebd762c83ade61f6f8f6bf7bda5)
+
 
 import { els } from "./core/domRefs.js";
+
+/**
+ * Converts a raw answer label to a numeric value.
+ * Supported:
+ *  - "(10) Strongly agree"  -> 10
+ *  - "(1) Disagree"         -> 1
+ *  - "true"/"yes"           -> 1
+ *  - "false"/"no"           -> 0
+ *  - "3.5" / "42"           -> Number
+ *  - otherwise              -> NaN
+ */
 export function mapAnswer(raw) {
-  const r = String(raw ?? "")
-    .trim()
-    .toLowerCase();
-  if (r.startsWith("(") && r.length > 2) {
-    const n = Number(r.charAt(1));
+  const r = String(raw ?? "").trim().toLowerCase();
+
+  // (N) ... pattern (multi-digit)
+  const paren = r.match(/^\((\-?\d+(?:\.\d+)?)\)/);
+  if (paren) {
+    const n = Number(paren[1]);
     if (!Number.isNaN(n)) return n;
   }
-  if (r === "true") return 1;
-  if (r === "false") return 0;
-  const n = Number(r);
-  return Number.isNaN(n) ? NaN : n;
+
+  if (r === "true" || r === "yes") return 1;
+  if (r === "false" || r === "no") return 0;
+
+  // plain number
+  const num = Number(r);
+  if (!Number.isNaN(num)) return num;
+
+  return NaN;
 }
+
 export function normalizeQuestion(html) {
   const d = document.createElement("div");
   d.innerHTML = html ?? "";
   return d.textContent || d.innerText || "";
 }
-export function throttle(
-  fn,
-  wait = 150,
-  o = { leading: true, trailing: true },
-) {
-  let last = 0,
-    tid = null,
-    args,
-    ctx;
+
+export function throttle(fn, wait = 150, o = { leading: true, trailing: true }) {
+  let last = 0, tid = null, args, ctx;
   return function (...g) {
     const now = Date.now();
     if (!last && o.leading === false) last = now;
     const rem = wait - (now - last);
-    args = g;
-    ctx = this;
+    args = g; ctx = this;
     if (rem <= 0 || rem > wait) {
-      if (tid) {
-        clearTimeout(tid);
-        tid = null;
-      }
-      last = now;
-      fn.apply(ctx, args);
-      args = ctx = null;
+      if (tid) { clearTimeout(tid); tid = null; }
+      last = now; fn.apply(ctx, args); args = ctx = null;
     } else if (!tid && o.trailing !== false) {
       tid = setTimeout(() => {
         last = o.leading === false ? 0 : Date.now();
-        tid = null;
-        fn.apply(ctx, args);
-        args = ctx = null;
+        tid = null; fn.apply(ctx, args); args = ctx = null;
       }, rem);
     }
   };
 }
+
 export function setStatus(text) {
-  els?.chartStatus && (els.chartStatus.textContent = text ?? "");
+  if (els?.chartStatus) els.chartStatus.textContent = text ?? "";
 }
+
 export function escapeSingleQuotes(str) {
   return String(str ?? "").replace(/'/g, "\\'");
 }
+
 export function parseDatName(name) {
-  const s = String(name ?? "")
-    .trim()
-    .toUpperCase();
+  const s = String(name ?? "").trim().toUpperCase();
   const y = s.match(/(\d{4})/);
   if (!y) return null;
   const q = s.match(/Q([1-4])/);
   return { year: Number(y[1]), quarter: q ? Number(q[1]) : 0 };
 }
+
 export function compareDatNames(a, b) {
-  const pa = parseDatName(a),
-    pb = parseDatName(b);
+  const pa = parseDatName(a), pb = parseDatName(b);
   if (pa && pb) {
     if (pa.year !== pb.year) return pa.year - pb.year;
     return pa.quarter - pb.quarter;
@@ -1846,10 +1922,12 @@ export function compareDatNames(a, b) {
   if (!pa && pb) return -1;
   return String(a).localeCompare(String(b));
 }
+
 export function getQueryParam(name) {
   const p = new URLSearchParams(window.location.search);
   return p.get(name);
 }
+
 export function upsertQueryParams(obj) {
   const url = new URL(window.location.href);
   const p = url.searchParams;
@@ -1859,30 +1937,17 @@ export function upsertQueryParams(obj) {
   });
   window.history.replaceState({}, "", url.toString());
 }
+
 export const storage = {
-  get(key) {
-    try {
-      return JSON.parse(localStorage.getItem(key));
-    } catch {
-      return null;
-    }
-  },
-  set(key, val) {
-    try {
-      localStorage.setItem(key, JSON.stringify(val));
-    } catch {}
-  },
-  del(key) {
-    try {
-      localStorage.removeItem(key);
-    } catch {}
-  },
+  get(key) { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } },
+  set(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} },
+  del(key) { try { localStorage.removeItem(key); } catch {} },
 };
 
 ----- END FILE: assets/js/utils.js -----
 
 ----- BEGIN FILE: index.html -----
-(sha1: 483e860077fee07a9ad7a4fa8f226701b47b16a8)
+(sha1: b2178a9bc2b7bf0a529e6c7ca344c9d299e027fd)
 
 <!DOCTYPE html>
 <html lang="en">
@@ -1890,11 +1955,14 @@ export const storage = {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Answers Over Time</title>
+
   <link rel="stylesheet" href="assets/css/base.css" />
   <link rel="stylesheet" href="assets/css/bar-theme.css" />
   <link rel="stylesheet" href="assets/css/components.css" />
   <link rel="stylesheet" href="assets/css/longtext.css" />
   <link rel="stylesheet" href="assets/css/score-changes.css" />
+
+  <!-- Keeps your underline treatment consistent even if button styles vary -->
   <style id="tab-underline-enforcer">
     #team-button-bar .team-tab.active,
     #team-button-bar .team-tab[aria-selected="true"],
@@ -1919,30 +1987,46 @@ export const storage = {
       background-color: transparent !important;
     }
   </style>
+
+  <!-- Consider pinning Chart.js to a specific version in production -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script type="module" src="assets/js/index.js"></script>
 </head>
 <body>
+
   <main>
     <section aria-labelledby="teams-label">
       <h2 id="teams-label" class="sr-only">Filter by vertical</h2>
       <div id="team-button-bar" class="team-tabs" role="tablist" aria-label="Verticals"></div>
     </section>
+
     <section class="controls" aria-labelledby="controls-label">
       <h2 id="controls-label" class="sr-only">Controls</h2>
       <div id="respondentDropdown" class="control-group">
         <div id="respondentCombo" class="combo" aria-label="Respondent filter">
           <label for="respondentFilter" class="sr-only">Select respondent</label>
-          <input id="respondentFilter" type="search" placeholder="Select a respondent from the list…" autocomplete="off"
-                 aria-label="Select respondent" role="combobox" aria-autocomplete="list" aria-expanded="false"
-                 aria-haspopup="listbox" aria-controls="respondentList" />
+          <input
+            id="respondentFilter"
+            type="search"
+            placeholder="Select a respondent from the list…"
+            autocomplete="off"
+            aria-label="Select respondent"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-haspopup="listbox"
+            aria-controls="respondentList"
+          />
           <div id="respondentPanel" class="combo-panel" hidden>
             <ul id="respondentList" role="listbox" tabindex="-1" aria-label="Respondents"></ul>
           </div>
         </div>
-        <button id="loadVerticalBtn" type="button" class="btn btn--secondary" aria-label="Load Vertical Report">Load Vertical Report</button>
+        <button id="loadVerticalBtn" type="button" class="btn btn--secondary" aria-label="Load Vertical Report">
+          Load Vertical Report
+        </button>
       </div>
     </section>
+
     <section aria-labelledby="chart-label">
       <h2 id="chart-label" class="sr-only">Combined answer score over DAT surveys</h2>
       <div class="chart-container" hidden>
@@ -1950,6 +2034,7 @@ export const storage = {
       </div>
       <div id="chartStatus" class="status" aria-live="polite">Ready.</div>
     </section>
+
     <section id="mc-section" hidden>
       <div id="multichoice-answer-list" class="multichoice-answer-container"></div>
     </section>
