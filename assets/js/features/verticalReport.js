@@ -9,32 +9,19 @@ import { mapAnswer, setStatus, normalizeQuestion } from '../utils.js';
 import { replaceChartData, clearReportAreas } from '../ui/chart.js';
 import { renderScoreChanges } from '../ui/scoreChanges.js';
 import { reloadRespondentsForVertical } from '../ui/combobox.js';
-// NEW: strengths section for teams
 import { renderTeamStrengths } from '../ui/teamStrengths.js';
 
-/**
- * Load vertical (choice parent) buttons and wire up tab behavior.
- * Exports: loadVerticals()
- */
 export async function loadVerticals() {
   const wsId = getWorkspaceId();
-
-  // Get the list of vertical Choice Parents
   const body = { FieldIdentifier: { Guids: [GUIDS.VERTICALS_FIELD] } };
   const data = await fetchJson(ROUTES.choiceParents(wsId), {
     method: 'POST',
     body: JSON.stringify(body),
   });
-
-  // Sort A→Z for stable UX
   data.sort((a, b) => (a?.Name ?? '').localeCompare(b?.Name ?? '', undefined, { sensitivity: 'base' }));
-
   renderTeamButtons(data);
 }
 
-/**
- * Render the vertical tab strip and wire up click/keyboard behavior.
- */
 function renderTeamButtons(data) {
   const container = els.teamBar;
   container.innerHTML = '';
@@ -68,7 +55,6 @@ function renderTeamButtons(data) {
     container.appendChild(btn);
   });
 
-  // Activate first tab by default and pre-load its respondent list
   const first = container.querySelector('button[role="tab"]');
   if (first) {
     setActiveTab(container, first);
@@ -80,7 +66,6 @@ function renderTeamButtons(data) {
     });
   }
 
-  // Keyboard support (Left/Right)
   container.addEventListener('keydown', (e) => {
     const tabs = [...container.querySelectorAll('button[role="tab"]')];
     const active = container.querySelector('button.active');
@@ -101,24 +86,12 @@ function setActiveTab(container, newActive) {
   newActive.tabIndex = 0;
 }
 
-/**
- * Build the Team (vertical) chart and score changes for SingleChoice + Yes/No,
- * then load the Team-level MultiChoice aggregation in a separate module.
- *
- * Exports: loadTeamAnswers()
- *
- * @param {{ guid: string, artifactId?: number|null, name?: string }} verticalChoice
- */
 export async function loadTeamAnswers(verticalChoice) {
   if (els.mcSection) els.mcSection.hidden = true;
-  if (els.pageHeader) els.pageHeader.hidden = true;
 
   setStatus(`Loading team answers for ${verticalChoice?.name ?? 'selected vertical'}…`);
 
   const wsId = getWorkspaceId();
-
-  // NOTE: This condition already has correct spacing and parentheses.
-  // It includes both SingleChoice and Yes/No, limited to the selected Vertical.
   const base = {
     Request: {
       ObjectType: { GUID: GUIDS.ANSWER_OBJ },
@@ -128,7 +101,7 @@ export async function loadTeamAnswers(verticalChoice) {
         { GUID: GUIDS.DAT },            // [2]
         { GUID: GUIDS.RESPONDENT_REF }, // [3]
         { GUID: GUIDS.YES_NO },         // [4]
-        { GUID: GUIDS.QUESTION_TEXT },  // [5]  <-- Question Text index
+        { GUID: GUIDS.QUESTION_TEXT },  // [5]
       ],
       condition:
         `('Question::Answer Type' == CHOICE ${GUIDS.TYPE_SINGLE} ` +
@@ -138,18 +111,14 @@ export async function loadTeamAnswers(verticalChoice) {
     },
   };
 
-  // Pull all pages
   const rows = await fetchAllQuerySlim(wsId, base, 1000);
 
-  // Team MultiChoice rendering area should start empty
   if (els.multiList) els.multiList.innerHTML = '';
 
-  // Build period axis
   const periods = [...new Set(rows.map((r) => r.Values?.[2]?.Name).filter(Boolean))];
   const earliest = periods[0];
   const latest = periods[periods.length - 1];
 
-  // series[qId][respondent][period] = numericValue
   const series = {};
   const qTextMap = {};
 
@@ -159,7 +128,7 @@ export async function loadTeamAnswers(verticalChoice) {
     const period = r.Values?.[2]?.Name;
     const respondent = r.Values?.[3]?.Name;
     const yesno = r.Values?.[4]?.Name;
-    const qTextRaw = r.Values?.[5]?.Name ?? r.Values?.[5]; // <-- reads [5]
+    const qTextRaw = r.Values?.[5]?.Name ?? r.Values?.[5];
     const valRaw = single ?? yesno ?? 0;
 
     if (!qId || !period || !respondent) return;
@@ -172,7 +141,6 @@ export async function loadTeamAnswers(verticalChoice) {
     if (qt && !qTextMap[qId]) qTextMap[qId] = qt;
   });
 
-  // Determine fully-covered respondent–question pairs
   const eligiblePairs = [];
   Object.keys(series).forEach((qId) => {
     Object.keys(series[qId]).forEach((resp) => {
@@ -182,7 +150,6 @@ export async function loadTeamAnswers(verticalChoice) {
     });
   });
 
-  // Chart totals per period
   const totals = periods.map((p) => {
     let sum = 0;
     for (const { qId, resp } of eligiblePairs) {
@@ -194,13 +161,10 @@ export async function loadTeamAnswers(verticalChoice) {
 
   replaceChartData(periods, totals);
 
-  // NEW: strengths & training needs for this team (latest DAT)
   renderTeamStrengths(rows, { topN: 5, minResponses: 2 });
 
-  // Render Team MultiChoice aggregation
   import('./teamMultiChoiceAgg.js').then((m) => m.loadTeamMultiChoiceAnswers(verticalChoice.guid));
 
-  // Score changes
   const changes = [];
   Object.keys(series).forEach((qId) => {
     const respondents = Object.keys(series[qId] ?? {});

@@ -1,4 +1,4 @@
-import { start } from './app.js';
-import { initThemeToggle } from './theme.js';
-initThemeToggle();
+// assets/js/index.js
+import { start } from "./app.js";
+// No theme toggle: keep bootstrap minimal
 start();

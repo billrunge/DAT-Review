@@ -1,36 +1,28 @@
 
 // assets/js/ui/chart.js
 // Centralized Chart.js configuration + helpers used by the DAT Review page.
-// - Theme-aware defaults (colors, fonts, grid, tooltip background)
-// - Shared chart instance helpers
-// - Exposes replaceChartData() and clearReportAreas() expected by feature modules
-// - Wires in clearTeamStrengths() so the new section resets with the page
 
 import { els } from '../core/domRefs.js';
 import { clearTeamStrengths } from './teamStrengths.js';
 
 let chart = null;
 
-/** Read a CSS variable from :root safely. */
 function cssVar(name) {
   return getComputedStyle(document.documentElement)
     .getPropertyValue(name)
     .trim();
 }
 
-/** Build a theme object from your CSS tokens (with fallbacks). */
 function theme() {
   const text   = cssVar('--text') || '#0f172a';
   const grid   = cssVar('--border') || '#e5e8f0';
   const brand  = cssVar('--brand') || '#2b5eff';
   const brandA = cssVar('--brand-alpha-20') || 'rgba(43,94,255,.20)';
-  const font   = cssVar('--font-sans') ||
-    'system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif';
+  const font   = cssVar('--font-sans') || 'system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif';
   const tooltipBg = cssVar('--tooltip-bg') || cssVar('--bg') || '#ffffff';
   return { text, grid, brand, brandA, font, tooltipBg };
 }
 
-/** Apply theme settings into global Chart.js defaults. */
 function applyChartDefaults() {
   const t = theme();
   if (typeof Chart === 'undefined') return;
@@ -38,12 +30,10 @@ function applyChartDefaults() {
   Chart.defaults.color = t.text;
   Chart.defaults.font.family = t.font;
 
-  // Legend
   Chart.defaults.plugins.legend = Chart.defaults.plugins.legend || {};
   Chart.defaults.plugins.legend.labels = Chart.defaults.plugins.legend.labels || {};
   Chart.defaults.plugins.legend.labels.color = t.text;
 
-  // ✅ Tooltip readability (light/dark)
   Chart.defaults.plugins.tooltip = Chart.defaults.plugins.tooltip || {};
   Chart.defaults.plugins.tooltip.enabled = true;
   Chart.defaults.plugins.tooltip.titleColor = t.text;
@@ -57,7 +47,6 @@ function applyChartDefaults() {
   Chart.defaults.plugins.tooltip.boxHeight       = 8;
   Chart.defaults.plugins.tooltip.boxPadding      = 4;
 
-  // Scales
   Chart.defaults.scales = Chart.defaults.scales || {};
   Chart.defaults.scales.x = Chart.defaults.scales.x || {};
   Chart.defaults.scales.y = Chart.defaults.scales.y || {};
@@ -67,7 +56,6 @@ function applyChartDefaults() {
   Chart.defaults.scales.y.ticks = { ...(Chart.defaults.scales.y.ticks || {}), color: t.text };
 }
 
-/** React to theme changes */
 const themeObserver = new MutationObserver(() => {
   applyChartDefaults();
   const c = getChart();
@@ -80,10 +68,8 @@ try {
   });
 } catch {}
 
-/** Get current chart instance (if any). */
 function getChart() { return chart || null; }
 
-/** Destroy current chart safely and clear the canvas. */
 export function destroyChart() {
   const c = getChart();
   if (c && typeof c.destroy === 'function') c.destroy();
@@ -96,7 +82,6 @@ export function destroyChart() {
   }
 }
 
-/** Ensure a single chart instance exists and is configured. */
 export function ensureChart() {
   if (typeof Chart === 'undefined') {
     throw new Error('Chart library not loaded.');
@@ -109,7 +94,6 @@ export function ensureChart() {
       return null;
     }
     chart = new Chart(canvas, {
-      // Explicit type (your dataset also sets type:'bar', which is fine)
       type: 'bar',
       data: { labels: [], datasets: [] },
       options: { responsive: true, maintainAspectRatio: true, animation: { duration: 250 } }
@@ -118,9 +102,7 @@ export function ensureChart() {
   return chart;
 }
 
-/** Replace labels/dataset and (critically) unhide the chart container. */
 export function replaceChartData(labels, totals, datasetLabel = 'Total score') {
-  // 🔁 restore original behavior: unhide container on render
   const container =
     (els?.chartCanvas && els.chartCanvas.parentElement) ||
     document.getElementById('answersChart')?.parentElement;
@@ -144,7 +126,6 @@ export function replaceChartData(labels, totals, datasetLabel = 'Total score') {
     }
   ];
 
-  // Preserve your per-render options (legend, scales, tooltip label callback)
   c.options = {
     responsive: true,
     plugins: {
@@ -180,7 +161,6 @@ export function replaceChartData(labels, totals, datasetLabel = 'Total score') {
   c.update();
 }
 
-/** Clear all report areas and hide the chart container. */
 export function clearReportAreas() {
   try { destroyChart(); } catch {}
   const container =
@@ -188,11 +168,10 @@ export function clearReportAreas() {
     document.getElementById('answersChart')?.parentElement;
   if (container) container.hidden = true;
 
-  // NEW: also clear Strengths & Training Needs
+  // Also clear Strengths & Training Needs
   try { clearTeamStrengths(); } catch {}
 
   if (els?.chartStatus) els.chartStatus.textContent = '';
-  if (els?.pageHeader) els.pageHeader.hidden = true;
   if (els?.multiList) els.multiList.innerHTML = '';
   if (els?.mcSection) els.mcSection.hidden = true;
 

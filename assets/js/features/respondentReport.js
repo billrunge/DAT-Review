@@ -1,4 +1,5 @@
 
+// assets/js/features/respondentReport.js
 import { els } from "../core/domRefs.js";
 import { GUIDS } from "../core/constants.js";
 import { fetchAllQuerySlim } from "../core/graph.js";
@@ -11,13 +12,11 @@ import { renderScoreChanges } from "../ui/scoreChanges.js";
 import { getSelectedRespondentId } from "../ui/combobox.js";
 
 export async function loadRespondentAnswers() {
-  // Hide/clear ancillary sections up front
   if (els.mcSection) els.mcSection.hidden = true;
   const sc = document.getElementById("score-change-section");
   if (sc) sc.hidden = true;
   const lt = document.getElementById("longtext-section");
   if (lt) lt.hidden = true;
-  if (els.pageHeader) els.pageHeader.hidden = true;
 
   const id = getSelectedRespondentId();
   if (!id) {
@@ -29,7 +28,6 @@ export async function loadRespondentAnswers() {
   setStatus("Loading respondent chart…");
   const ws = getWorkspaceId();
 
-  // ✅ FIXED: add parentheses so OR doesn’t escape the Respondent filter
   const base = {
     Request: {
       ObjectType: { GUID: GUIDS.ANSWER_OBJ },
@@ -50,7 +48,6 @@ export async function loadRespondentAnswers() {
 
   const rows = await fetchAllQuerySlim(ws, base, 1000);
 
-  // Build and **sort** DAT periods (robust to server sort quirks)
   const periods = Array.from(
     new Set(rows.map((r) => r.Values?.[2]?.Name).filter(Boolean))
   );
@@ -58,7 +55,6 @@ export async function loadRespondentAnswers() {
   const earliest = periods[0];
   const latest = periods[periods.length - 1];
 
-  // Build series: per-question per-period values
   const series = {};
   const qTextMap = {};
 
@@ -74,12 +70,10 @@ export async function loadRespondentAnswers() {
     if (qt && !qTextMap[q]) qTextMap[q] = qt;
   });
 
-  // Only include questions that have values for every period
   const eligible = Object.keys(series).filter((q) =>
     periods.every((p) => series[q][p] !== undefined)
   );
 
-  // Totals per period across fully covered questions
   const totals = periods.map((p) =>
     eligible.reduce((s, q) => {
       const v = series[q][p];
@@ -89,7 +83,6 @@ export async function loadRespondentAnswers() {
 
   replaceChartData(periods, totals);
 
-  // Build per-question deltas (earliest → latest)
   const changes = [];
   Object.keys(series).forEach((q) => {
     const from = series[q][earliest];
@@ -112,10 +105,8 @@ export async function loadRespondentAnswers() {
     5
   );
 
-  // Strengths/needs at the respondent level
   renderExtremes(rows, series, periods, qTextMap);
 
-  // Detail sections
   await loadRespondentMultiChoiceAnswers(id);
   await loadRespondentLongTextAnswers(id);
 
@@ -123,7 +114,6 @@ export async function loadRespondentAnswers() {
 }
 
 function renderExtremes(rows, series, periods, map) {
-  // Identify questions that are purely SingleChoice (exclude Yes/No)
   const types = new Map();
   rows.forEach((r) => {
     const q = r.Values?.[0]?.Name;
@@ -160,16 +150,13 @@ function renderExtremes(rows, series, periods, map) {
     document.getElementById("score-change-section") || els.mcSection;
   const parent = anchor?.parentNode || document.body;
 
-  // Clear previous
   document.getElementById("extremes-section")?.remove();
   document.getElementById("extremes-section-header")?.remove();
 
-  // Header
   const header = document.createElement("h3");
   header.id = "extremes-section-header";
   header.textContent = "Respondent Strengths & Training Needs";
 
-  // Card
   const card = document.createElement("section");
   card.id = "extremes-section";
   card.className = "qa";
