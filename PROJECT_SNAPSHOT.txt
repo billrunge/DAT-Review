@@ -1,6 +1,6 @@
 # Project Snapshot
-Generated: 2026-01-23T16:20:56Z
-Commit: 401e16a
+Generated: 2026-01-23T20:16:10Z
+Commit: daf132a
 
 ----- BEGIN FILE: assets/css/bar-theme.css -----
 (sha1: afc71031800933e51fcef77aeb0059fc4477257c)
@@ -13,8 +13,7 @@ body{ font-family:var(--font-sans); color:var(--text); background:var(--canvas);
 ----- END FILE: assets/css/bar-theme.css -----
 
 ----- BEGIN FILE: assets/css/base.css -----
-(sha1: 68145898917b3f23687a6169b8618d3907430a7a)
-
+(sha1: 711c56220b68054ce6e6bd294523d5fc43cb3ff4)
 
 /* assets/css/base.css */
 
@@ -36,7 +35,7 @@ body{ font-family:var(--font-sans); color:var(--text); background:var(--canvas);
   --space-4: 16px;
   --space-5: 24px;
 
-  --shadow: 0 8px 16px rgba(0,0,0,.06);
+  --shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
 
   /* Typography for charts and UI */
   --font-sans: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -53,14 +52,16 @@ body{ font-family:var(--font-sans); color:var(--text); background:var(--canvas);
   --bg-hover: #111827;
   --border: #334155;
 
-  --shadow: 0 8px 16px rgba(0,0,0,.30);
+  --shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 
   /* Tooltip should be slightly lighter than page bg for contrast */
   --tooltip-bg: #111827;
 }
 
 /* ===== Global Resets & Base ===== */
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   font: 14px/1.5 var(--font-sans);
@@ -79,16 +80,20 @@ body {
   padding: 0 !important;
   margin: -1px !important;
   overflow: hidden !important;
-  clip: rect(0,0,0,0) !important;
+  clip: rect(0, 0, 0, 0) !important;
   white-space: nowrap !important;
   border: 0 !important;
 }
 
 /* Page layout primitives */
 .page-header,
-.page-footer { margin-block: var(--space-4); }
+.page-footer {
+  margin-block: var(--space-4);
+}
 
-.controls { margin-block: var(--space-4); }
+.controls {
+  margin-block: var(--space-4);
+}
 
 .control-group {
   display: flex;
@@ -97,7 +102,9 @@ body {
   flex-wrap: wrap;
 }
 
-label { font-weight: 600; }
+label {
+  font-weight: 600;
+}
 
 /* Inputs & buttons (tabs may style themselves separately) */
 input,
@@ -141,16 +148,25 @@ input:focus-visible {
 }
 
 /* ===== Strengths & Training Needs (team) — optional styling ===== */
-.stn-section { margin-top: var(--space-5); }
+.stn-section {
+  margin-top: var(--space-5);
+}
 .stn-header {
-  display: flex; align-items: baseline; justify-content: space-between;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
   margin-bottom: var(--space-3);
 }
-.stn-title { font-weight: 700; }
-.stn-subtitle { opacity: .75; }
+.stn-title {
+  font-weight: 700;
+}
+.stn-subtitle {
+  opacity: 0.75;
+}
 
 .stn-grid {
-  display: grid; gap: var(--space-4);
+  display: grid;
+  gap: var(--space-4);
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 .stn-block {
@@ -160,17 +176,98 @@ input:focus-visible {
   padding: var(--space-4);
   box-shadow: var(--shadow);
 }
-.stn-list { list-style: none; margin: 0; padding: 0; }
-.stn-list li {
-  display: flex; align-items: baseline; justify-content: space-between;
-  padding: 6px 0; border-bottom: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+.stn-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
-.stn-list li:last-child { border-bottom: 0; }
-.stn-question { inline-size: 70%; }
-.stn-metric { font-variant-numeric: tabular-nums; font-weight: 600; margin-left: 8px; }
-.stn-count { opacity: .65; margin-left: 8px; }
+.stn-list li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+}
+.stn-list li:last-child {
+  border-bottom: 0;
+}
+.stn-question {
+  inline-size: 70%;
+}
+.stn-metric {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  margin-left: 8px;
+}
+.stn-count {
+  opacity: 0.65;
+  margin-left: 8px;
+}
 
-.stn-empty { opacity: .7; margin: 0; }
+.stn-empty {
+  opacity: 0.7;
+  margin: 0;
+}
+
+/* ===========================
+   PRINT / EXPORT TO PDF MODE
+   =========================== */
+@media print {
+  /* Remove padding around the body to maximize printable width */
+  body {
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000 !important;
+  }
+
+  /* Hide interactive UI that shouldn't appear in a PDF */
+  .controls,
+  #respondentCombo,
+  #respondentPanel,
+  #team-button-bar,
+  #loadVerticalBtn,
+  #chartStatus,
+  .combo-panel,
+  .team-tabs,
+  .sr-only {
+    display: none !important;
+  }
+
+  /* Keep charts sharp and full-width */
+  .chart-container {
+    margin: 0 0 24px 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  canvas {
+    page-break-inside: avoid;
+  }
+
+  /* Improve card readability on PDF */
+  .qa,
+  .stn-block {
+    background: #fff !important;
+    border-color: #ccc !important;
+    box-shadow: none !important;
+  }
+
+  /* Page break handling for long reports */
+  section,
+  .qa,
+  .stn-block,
+  #longtext-section {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin-bottom: 24px;
+  }
+
+  /* Make long text answers more readable */
+  .lt-answer {
+    white-space: pre-wrap;
+    font-size: 14px;
+  }
+}
 
 ----- END FILE: assets/css/base.css -----
 
@@ -247,7 +344,7 @@ details[open] .lt-summary::before{ content:"▾"; }
 ----- END FILE: assets/css/score-changes.css -----
 
 ----- BEGIN FILE: assets/js/app.js -----
-(sha1: 8ff262c58f0857bc938234d3dbf335163228b272)
+(sha1: 644f174bb35c3fa21f0e9e66a48467cb5389447e)
 
 import { initCombobox, clearRespondentSelection } from "./ui/combobox.js";
 import { loadVerticals, loadTeamAnswers } from "./features/verticalReport.js";
@@ -281,6 +378,18 @@ export async function start() {
     setStatus(`Initialization failed: ${e.message}`);
   }
 }
+
+
+// Expose global PDF export (can be called by browser bookmarklet or console)
+export function exportPDF() {
+  // Allow Chart.js animations to finish rendering
+  setTimeout(() => {
+    window.print();
+  }, 150);
+}
+
+// Wire hidden button for internal use
+document.getElementById("exportToPDF")?.addEventListener("click", exportPDF);
 
 ----- END FILE: assets/js/app.js -----
 
@@ -1851,10 +1960,11 @@ export const storage = {
 ----- END FILE: assets/js/utils.js -----
 
 ----- BEGIN FILE: index.html -----
-(sha1: b2178a9bc2b7bf0a529e6c7ca344c9d299e027fd)
+(sha1: b07ccc894b5840b189ef08b06b8fb55b530674cf)
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -1885,17 +1995,19 @@ export const storage = {
       outline: none !important;
       filter: none !important;
     }
+
     #team-button-bar .team-tab,
     #team-button-bar .team-tab * {
       background: transparent !important;
       background-color: transparent !important;
     }
   </style>
-
+  <button id="exportToPDF" class="sr-only" aria-hidden="true">Export PDF</button>
   <!-- Consider pinning Chart.js to a specific version in production -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script type="module" src="assets/js/index.js"></script>
 </head>
+
 <body>
 
   <main>
@@ -1909,18 +2021,9 @@ export const storage = {
       <div id="respondentDropdown" class="control-group">
         <div id="respondentCombo" class="combo" aria-label="Respondent filter">
           <label for="respondentFilter" class="sr-only">Select respondent</label>
-          <input
-            id="respondentFilter"
-            type="search"
-            placeholder="Select a respondent from the list…"
-            autocomplete="off"
-            aria-label="Select respondent"
-            role="combobox"
-            aria-autocomplete="list"
-            aria-expanded="false"
-            aria-haspopup="listbox"
-            aria-controls="respondentList"
-          />
+          <input id="respondentFilter" type="search" placeholder="Select a respondent from the list…" autocomplete="off"
+            aria-label="Select respondent" role="combobox" aria-autocomplete="list" aria-expanded="false"
+            aria-haspopup="listbox" aria-controls="respondentList" />
           <div id="respondentPanel" class="combo-panel" hidden>
             <ul id="respondentList" role="listbox" tabindex="-1" aria-label="Respondents"></ul>
           </div>
@@ -1944,8 +2047,8 @@ export const storage = {
     </section>
   </main>
 </body>
-</html>
 
+</html>
 ----- END FILE: index.html -----
 
 ## Included files
