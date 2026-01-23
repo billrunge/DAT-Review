@@ -2,9 +2,9 @@
 name: Build Project Snapshot
 
 on:
-  workflow_dispatch:
-  push:
-    branches: [ main, initial-refactor ]
+  # workflow_dispatch:
+  push
+    # branches: [ main ]
 
 # 👇 Add this block
 permissions:
