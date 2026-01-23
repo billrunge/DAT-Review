@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Answers Over Time</title>
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/bar-theme.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/longtext.css" />
+  <link rel="stylesheet" href="assets/css/score-changes.css" />
+  <style id="tab-underline-enforcer">
+    #team-button-bar .team-tab.active,
+    #team-button-bar .team-tab[aria-selected="true"],
+    #team-button-bar .team-tab.active:hover,
+    #team-button-bar .team-tab[aria-selected="true"]:hover,
+    #team-button-bar .team-tab:focus,
+    #team-button-bar .team-tab.active:focus,
+    #team-button-bar .team-tab[aria-selected="true"]:focus,
+    #team-button-bar .team-tab:focus-visible,
+    #team-button-bar .team-tab.active:focus-visible,
+    #team-button-bar .team-tab[aria-selected="true"]:focus-visible {
+      background: linear-gradient(var(--proc-underline), var(--proc-underline)) left 100% / 100% 2px no-repeat !important;
+      background-color: transparent !important;
+      color: var(--text) !important;
+      box-shadow: none !important;
+      outline: none !important;
+      filter: none !important;
+    }
+    #team-button-bar .team-tab,
+    #team-button-bar .team-tab * {
+      background: transparent !important;
+      background-color: transparent !important;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" src="assets/js/index.js"></script>
+</head>
+<body>
+  <main>
+    <section aria-labelledby="teams-label">
+      <h2 id="teams-label" class="sr-only">Filter by vertical</h2>
+      <div id="team-button-bar" class="team-tabs" role="tablist" aria-label="Verticals"></div>
+    </section>
+    <section class="controls" aria-labelledby="controls-label">
+      <h2 id="controls-label" class="sr-only">Controls</h2>
+      <div id="respondentDropdown" class="control-group">
+        <div id="respondentCombo" class="combo" aria-label="Respondent filter">
+          <label for="respondentFilter" class="sr-only">Select respondent</label>
+          <input id="respondentFilter" type="search" placeholder="Select a respondent from the list…" autocomplete="off"
+                 aria-label="Select respondent" role="combobox" aria-autocomplete="list" aria-expanded="false"
+                 aria-haspopup="listbox" aria-controls="respondentList" />
+          <div id="respondentPanel" class="combo-panel" hidden>
+            <ul id="respondentList" role="listbox" tabindex="-1" aria-label="Respondents"></ul>
+          </div>
+        </div>
+        <button id="loadVerticalBtn" type="button" class="btn btn--secondary" aria-label="Load Vertical Report">Load Vertical Report</button>
+      </div>
+    </section>
+    <section aria-labelledby="chart-label">
+      <h2 id="chart-label" class="sr-only">Combined answer score over DAT surveys</h2>
+      <div class="chart-container" hidden>
+        <canvas id="answersChart" aria-label="Answers chart" role="img"></canvas>
+      </div>
+      <div id="chartStatus" class="status" aria-live="polite">Ready.</div>
+    </section>
+    <section id="mc-section" hidden>
+      <div id="multichoice-answer-list" class="multichoice-answer-container"></div>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,33 @@
+
+/* buttons */
+.btn{ display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--surface-1); color:var(--text); font-weight:600; cursor:pointer; }
+.btn--primary{ background:var(--brand); color:#fff; }
+.btn--primary:hover{ box-shadow:0 0 0 3px var(--brand-alpha-20); }
+.btn--secondary:hover{ background:color-mix(in oklab, var(--brand) 6%, var(--surface-1)); }
+/* tabs */
+.team-tabs{ display:flex; gap:var(--space-4); border-bottom:1px solid var(--border); margin-bottom:var(--space-4); padding:0 var(--space-1); background:transparent; overflow-x:auto; }
+.team-tab{ appearance:none; border:none; padding:var(--space-3) var(--space-1); font-size:.95rem; font-weight:600; color:var(--text-muted); cursor:pointer; background:transparent!important; background-image:none!important; background-repeat:no-repeat; background-position:left 100%; background-size:0 0; border-radius:0; transition:none!important; }
+.team-tab:not(.active):hover{ background:transparent!important; background-image:none!important; color:var(--text-muted)!important; }
+.team-tab.active, .team-tab[aria-selected="true"], .team-tab.active:hover, .team-tab[aria-selected="true"]:hover, .team-tab.active:focus, .team-tab[aria-selected="true"]:focus, .team-tab.active:focus-visible, .team-tab[aria-selected="true"]:focus-visible{
+  background:transparent!important; background-color:transparent!important; color:var(--text)!important;
+  background-image:linear-gradient(var(--proc-underline), var(--proc-underline))!important; background-size:100% 2px!important; background-position:left 100%!important; box-shadow:none!important; filter:none!important;
+}
+.team-tab:focus-visible{ outline:3px solid var(--focus-ring); outline-offset:2px; }
+#team-button-bar .team-tab, #team-button-bar .team-tab:hover, #team-button-bar .team-tab:focus, #team-button-bar .team-tab:focus-visible, #team-button-bar .team-tab:active{ background:transparent!important; background-color:transparent!important; box-shadow:none!important; filter:none!important; border:0!important; }
+#team-button-bar .team-tab.active, #team-button-bar .team-tab[aria-selected="true"], #team-button-bar .team-tab.active:hover, #team-button-bar .team-tab.active:focus, #team-button-bar .team-tab.active:focus-visible, #team-button-bar .team-tab[aria-selected="true"]:hover, #team-button-bar .team-tab[aria-selected="true"]:focus, #team-button-bar .team-tab[aria-selected="true"]:focus-visible{
+  background:transparent!important; background-color:transparent!important; background-image:linear-gradient(var(--proc-underline), var(--proc-underline))!important; background-size:100% 2px!important; background-position:left 100%!important; color:var(--text)!important;
+}
+#team-button-bar .team-tab, #team-button-bar .team-tab.active, #team-button-bar .team-tab[aria-selected="true"]{ background-repeat:no-repeat!important; }
+/* combobox */
+.combo{ position:relative; display:inline-block; min-width:280px; max-width:360px; }
+.combo input[type="search"]{ width:100%; border-radius:var(--radius-sm); }
+.combo.open input[type="search"]{ border-bottom-left-radius:0; border-bottom-right-radius:0; }
+.combo-panel{ position:absolute; left:0; right:0; margin-top:-1px; background:var(--surface-1); border:1px solid var(--border); border-top:none; border-bottom-left-radius:var(--radius-sm); border-bottom-right-radius:var(--radius-sm); box-shadow:var(--shadow-sm); z-index:10; max-height:260px; overflow-y:auto; }
+#respondentList{ list-style:none; margin:0; padding:4px; }
+#respondentList li[role="option"]{ padding:8px 10px; border-radius:8px; cursor:pointer; }
+#respondentList li[role="option"]:hover, #respondentList li[aria-selected="true"], #respondentList li.active{ background:var(--brand-alpha-20); }
+#respondentList li.empty{ color:var(--text-muted); }
+/* mc */
+.mc-count-badge{ display:inline-block; margin-left:8px; padding:2px 10px; border-radius:999px; font-size:.85rem; font-weight:700; background:var(--brand-alpha-20); color:var(--brand); }
+#multichoice-answer-list ul{ list-style:disc; padding-left:1.4rem; }
+#multichoice-answer-list li{ margin:4px 0; }

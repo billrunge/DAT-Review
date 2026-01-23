@@ -1,0 +1,10 @@
+
+#score-change-section{ margin-top:var(--space-5); }
+#score-change-section h2{ margin-bottom:var(--space-3); font-size:1.25rem; font-weight:700; }
+#score-change-section h3, #extremes-section-header{ margin:var(--space-3) 0 var(--space-2); font-size:1rem; font-weight:700; }
+.sc-row{ display:flex; justify-content:space-between; gap:12px; }
+.sc-question{ flex:1; min-width:0; line-height:1.45; }
+.sc-badge{ display:inline-flex; align-items:center; gap:4px; padding:2px 10px; border-radius:999px; font-size:.85rem; font-weight:700; line-height:1.3; }
+.sc-up{ background:#e7f3ff; color:#0b4dd6; }
+.sc-down{ background:#ffecec; color:#a31212; }
+.qa{ border:1px solid var(--border); border-radius:var(--radius); background:var(--surface-2); padding:var(--space-5); box-shadow:var(--shadow-sm); }
