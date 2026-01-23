@@ -1,27 +1,41 @@
-# Include all HTML, CSS, JS
+
+# .snapshotinclude
+# -----------------------------------------------------------------------------
+# Include patterns (relative to repo root). Blank lines and lines starting with
+# '#' are ignored by the workflow.
+# -----------------------------------------------------------------------------
+
+# Entry points & static HTML
+index.html
 *.html
+
+# Common web assets
 *.css
 *.js
 
-# Common project folders
-# src/**/*.js
-# src/**/*.ts
-# public/**/*.*
-# data/**/*.*
-# charts/**/*.*
-assets/**/*.*
-# scripts/**/*.*
-# styles/**/*.*
+# Source code (adjust to your structure)
+src/**/*.js
+src/**/*.ts
+src/**/*.tsx
+src/**/*.jsx
+scripts/**/*.*
+styles/**/*.*
+components/**/*.*
+charts/**/*.*
+lib/**/*.*
+utils/**/*.*
+public/**/*
 
-# Exclude things we don't want in the snapshot
-!node_modules/**
-!.git/**
-!dist/**
-!build/**
-!*.png
-!*.jpg
-!*.jpeg
-!*.gif
-!*.webp
-!*.zip
-!*.pdf
+# Data (text formats only—expand if you need others)
+data/**/*.json
+data/**/*.csv
+data/**/*.tsv
+assets/**/*.svg
+
+# -----------------------------------------------------------------------------
+# NOTE:
+# We don't need explicit "exclusions" here; the workflow filters binaries by
+# extension and only includes files tracked by git. If you want to *force*
+# excluding something text-like (e.g., huge generated JSON), remove the pattern
+# above or move it under build output folders (dist/build), which are skipped.
+# -----------------------------------------------------------------------------

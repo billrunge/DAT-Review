@@ -9,6 +9,7 @@ on:
 jobs:
   snapshot:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -21,38 +22,87 @@ jobs:
           set -euo pipefail
 
           SNAP="PROJECT_SNAPSHOT.txt"
-          INCLUDE=".snapshotinclude"
+          INCLUDE_FILE=".snapshotinclude"
 
-          echo "# Project Snapshot" > "$SNAP"
-          echo "Generated: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "$SNAP"
-          echo "Commit: $(git rev-parse --short HEAD)" >> "$SNAP"
-          echo >> "$SNAP"
+          # 1) Header
+          {
+            echo "# Project Snapshot"
+            echo "Generated: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+            echo "Commit: $(git rev-parse --short HEAD || echo 'N/A')"
+            echo
+          } > "$SNAP"
 
-          # Gather files matching the include patterns
-          files=$(git ls-files $(tr '\n' ' ' < "$INCLUDE"))
+          # 2) Patterns from .snapshotinclude (or defaults)
+          if [[ -f "$INCLUDE_FILE" ]]; then
+            # Strip comments and blanks
+            mapfile -t PATTERNS < <(grep -Ev '^\s*(#|$)' "$INCLUDE_FILE" || true)
+          else
+            echo "No .snapshotinclude found. Using default include patterns."
+            PATTERNS=( "*.html" "*.css" "*.js" "src/**/*.js" "src/**/*.ts" "public/**/*" "data/**/*" )
+          fi
 
-          # Filter out binaries based on extension
-          skip_ext="png|jpg|jpeg|gif|webp|pdf|zip|gz|7z|mp4|mp3|woff|woff2|ttf|eot"
-          filtered=""
+          # Ensure we have at least a few patterns
+          if [[ ${#PATTERNS[@]} -eq 0 ]]; then
+            echo ".snapshotinclude produced no patterns. Falling back to basic defaults."
+            PATTERNS=( "*.html" "*.css" "*.js" )
+          fi
+
+          # 3) Resolve files tracked by git that match patterns
+          #    Use '--' to terminate pathspecs. Quote patterns to preserve spaces.
+          FILES=$(git ls-files -- "${PATTERNS[@]}" || true)
+
+          # 4) Filter non-text/binary-like files and ignore blanks
+          SKIP_EXT='png|jpg|jpeg|gif|webp|pdf|zip|gz|7z|mp4|mp3|ogg|wav|mov|avi|mkv|ico|woff|woff2|ttf|otf|eot'
+          FILTERED=()
           while IFS= read -r f; do
-            if [[ ! "$f" =~ \.($skip_ext)$ ]] && [[ -f "$f" ]]; then
-              filtered+="$f"$'\n'
+            [[ -z "${f// }" ]] && continue           # skip blank
+            [[ ! -f "$f" ]] && continue              # only regular files
+            if [[ ! "$f" =~ \.($SKIP_EXT)$ ]]; then
+              FILTERED+=("$f")
             fi
-          done <<< "$files"
+          done <<< "$FILES"
 
-          # Concatenate into snapshot
-          while IFS= read -r f; do
-            echo "----- BEGIN FILE: $f -----" >> "$SNAP"
-            echo "(sha1: $(git hash-object "$f"))" >> "$SNAP"
-            echo >> "$SNAP"
-            sed -n '1,4000p' "$f" >> "$SNAP"
-            echo >> "$SNAP"
-            echo "----- END FILE: $f -----" >> "$SNAP"
-            echo >> "$SNAP"
-          done <<< "$filtered"
+          # 5) If nothing matched, fail with helpful info
+          if [[ ${#FILTERED[@]} -eq 0 ]]; then
+            echo "No files matched the include patterns:"
+            printf '  - %s\n' "${PATTERNS[@]}"
+            echo
+            echo "Tips:"
+            echo " - Ensure patterns are relative to repo root (e.g., 'index.html', 'src/**/*.js')."
+            echo " - Commit files you expect to include (git ls-files only returns tracked files)."
+            exit 1
+          fi
 
-          echo "## Included files" >> "$SNAP"
-          echo "$filtered" >> "$SNAP"
+          # 6) Debug preview
+          echo "Including ${#FILTERED[@]} files. First few:"
+          printf '  - %s\n' "${FILTERED[@]:0:20}"
+          echo
+
+          # 7) Concatenate with separators and SHA1; cap very long files to keep snapshot usable
+          MAX_LINES_PER_FILE=4000
+          for f in "${FILTERED[@]}"; do
+            {
+              echo "----- BEGIN FILE: $f -----"
+              echo "(sha1: $(git hash-object "$f" 2>/dev/null || shasum "$f" | awk '{print $1}'))"
+              echo
+              sed -n "1,${MAX_LINES_PER_FILE}p" "$f"
+              # If file is longer than cap, note the truncation
+              TOTAL_LINES=$(wc -l < "$f" || echo 0)
+              if (( TOTAL_LINES > MAX_LINES_PER_FILE )); then
+                echo
+                echo "[...truncated: $((TOTAL_LINES - MAX_LINES_PER_FILE)) additional lines not shown...]"
+              fi
+              echo
+              echo "----- END FILE: $f -----"
+              echo
+            } >> "$SNAP"
+          done
+
+          # 8) Footer index
+          {
+            echo "## Included files"
+            printf '%s\n' "${FILTERED[@]}"
+          } >> "$SNAP"
 
       - name: Commit snapshot if changed
         run: |
@@ -60,8 +110,15 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add PROJECT_SNAPSHOT.txt
-            git commit -m "Update PROJECT_SNAPSHOT.txt"
+            git commit -m "chore(snapshot): update PROJECT_SNAPSHOT.txt"
             git push
           else
-            echo "No changes detected"
+            echo "No changes to PROJECT_SNAPSHOT.txt"
           fi
+
+      # (Optional) Keep a build artifact for quick download from the Action run page
+      - name: Upload PROJECT_SNAPSHOT as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PROJECT_SNAPSHOT
+          path: PROJECT_SNAPSHOT.txt
