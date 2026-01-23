@@ -168,6 +168,10 @@ export function clearReportAreas() {
     document.getElementById('answersChart')?.parentElement;
   if (container) container.hidden = true;
 
+  // Hide floating print button
+  const fp = document.getElementById("floatingPrintBtn");
+  if (fp) fp.hidden = true;
+
   // Also clear Strengths & Training Needs
   try { clearTeamStrengths(); } catch {}
 

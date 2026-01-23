@@ -10,6 +10,10 @@ export async function start() {
     await initCombobox();
     await loadVerticals();
 
+    // Always start hidden (defensive)
+    const fp = document.getElementById("floatingPrintBtn");
+    if (fp) fp.hidden = true;
+
     els.loadVerticalBtn?.addEventListener("click", () => {
       const active = els.teamBar?.querySelector("button.team-tab.active");
       if (!active || !active.dataset.choiceGuid) {
@@ -28,6 +32,10 @@ export async function start() {
         setStatus(`Failed to load team answers: ${e.message}`),
       );
     });
+
+    // Wire floating print button + hidden internal trigger
+    document.getElementById("floatingPrintBtn")?.addEventListener("click", exportPDF);
+    document.getElementById("exportToPDF")?.addEventListener("click", exportPDF);
 
     setStatus("Ready.");
   } catch (e) {
@@ -103,6 +111,3 @@ export function exportPDF() {
     }, 150);
   }, 0);
 }
-
-// Wire hidden button for internal use
-document.getElementById("exportToPDF")?.addEventListener("click", exportPDF);

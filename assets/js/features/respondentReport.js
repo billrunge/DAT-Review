@@ -1,3 +1,4 @@
+
 // assets/js/features/respondentReport.js
 import { els } from "../core/domRefs.js";
 import { GUIDS } from "../core/constants.js";
@@ -125,6 +126,10 @@ export async function loadRespondentAnswers() {
   await loadRespondentLongTextAnswers(id);
 
   setStatus(`Chart updated. (${rows.length.toLocaleString()} records)`);
+
+  // SHOW floating print button
+  const fp = document.getElementById("floatingPrintBtn");
+  if (fp) fp.hidden = false;
 }
 
 function renderExtremes(rows, series, periods, map) {

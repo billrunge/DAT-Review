@@ -54,6 +54,14 @@
     <!-- Print-only dynamic report header (populated at runtime) -->
     <div id="print-report-header" class="print-only-report-header"></div>
 
+    <!-- Floating Print / Export button (shown when a report is loaded) -->
+    <button id="floatingPrintBtn" class="floating-print-btn" hidden title="Print / Export PDF" aria-label="Print / Export PDF">
+      <!-- Minimal print/PDF icon (Option 1) -->
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="white" aria-hidden="true" focusable="false">
+        <path d="M6 2h12v4h4v10h-4v6H6v-6H2V6h4V2zm2 0v4h8V2H8zm8 18v-4H8v4h8zM4 8v6h16V8H4z"/>
+      </svg>
+    </button>
+
     <section aria-labelledby="teams-label">
       <h2 id="teams-label" class="sr-only">Filter by vertical</h2>
       <div id="team-button-bar" class="team-tabs" role="tablist" aria-label="Verticals"></div>

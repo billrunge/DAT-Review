@@ -1,3 +1,4 @@
+
 /* assets/css/base.css */
 
 /* ===== CSS Tokens (Light theme) ===== */
@@ -24,7 +25,7 @@
   --font-sans: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 
   /* ===== Used by Chart.js tooltip ===== */
-  --tooltip-bg: #ffffff; /* light surface chip */
+  --tooltip-bg: #ffffff;
 }
 
 /* ===== CSS Tokens (Dark theme) ===== */
@@ -37,7 +38,6 @@
 
   --shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 
-  /* Tooltip should be slightly lighter than page bg for contrast */
   --tooltip-bg: #111827;
 }
 
@@ -89,7 +89,7 @@ label {
   font-weight: 600;
 }
 
-/* Inputs & buttons (tabs may style themselves separately) */
+/* Inputs & buttons */
 input,
 button {
   appearance: none;
@@ -99,10 +99,7 @@ button {
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius);
   cursor: pointer;
-  transition:
-    background 120ms ease,
-    border-color 120ms ease,
-    box-shadow 120ms ease;
+  transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
 }
 
 /* Text inputs */
@@ -111,26 +108,23 @@ input[type="search"] {
   cursor: text;
 }
 
-/* Hover (exclude custom-styled tab buttons) */
 button:hover:not(.team-tab) {
   background: var(--bg-hover);
   border-color: #9ca3af;
 }
 
-/* Accessible focus */
 button:focus-visible,
 input:focus-visible {
   outline: 3px solid color-mix(in oklab, var(--primary) 40%, transparent);
   outline-offset: 2px;
 }
 
-/* Helpful layout niceties */
 .chart-container {
   width: min(100%, 900px);
   margin: 0 auto;
 }
 
-/* ===== Strengths & Training Needs (team) — optional styling ===== */
+/* ===== Strengths & Training Needs ===== */
 .stn-section {
   margin-top: var(--space-5);
 }
@@ -192,18 +186,63 @@ input:focus-visible {
   margin: 0;
 }
 
+/* ================================
+   FLOATING PRINT / PDF BUTTON
+   ================================ */
+.floating-print-btn {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 9999;
+
+  background: var(--brand);
+  border: none;
+  color: #fff;
+
+  width: 48px;        /* Ensures a perfect circle */
+  height: 48px;
+  padding: 0;         /* Remove padding so SVG centers */
+
+  border-radius: 50%;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+  transition: background 0.2s ease, transform 0.2s ease;
+
+  overflow: visible;  /* Avoid clipping in some browsers */
+}
+
+/* Prevent clipping / baseline issues */
+.floating-print-btn svg {
+  width: 22px;
+  height: 22px;
+  display: block;   /* Removes baseline shift */
+}
+
+.floating-print-btn:hover {
+  background: color-mix(in oklab, var(--brand) 85%, #000);
+  transform: scale(1.05);
+}
+
+/* Critical: enforce hidden state */
+.floating-print-btn[hidden] {
+  display: none !important;
+}
+
 /* ===========================
    PRINT / EXPORT TO PDF MODE
    =========================== */
 @media print {
-  /* Remove padding around the body to maximize printable width */
   body {
     padding: 0 !important;
     background: #ffffff !important;
     color: #000 !important;
   }
 
-  /* Show a print-only dynamic header at the very top */
   .print-only-report-header {
     display: block !important;
     font-size: 20px;
@@ -213,7 +252,6 @@ input:focus-visible {
     color: #000 !important;
   }
 
-  /* Hide interactive UI that shouldn't appear in a PDF */
   .controls,
   #respondentCombo,
   #respondentPanel,
@@ -222,11 +260,11 @@ input:focus-visible {
   #chartStatus,
   .combo-panel,
   .team-tabs,
-  .sr-only {
+  .sr-only,
+  .floating-print-btn {
     display: none !important;
   }
 
-  /* Keep charts sharp and full-width */
   .chart-container {
     margin: 0 0 24px 0 !important;
     width: 100% !important;
@@ -237,7 +275,6 @@ input:focus-visible {
     page-break-inside: avoid;
   }
 
-  /* Improve card readability on PDF */
   .qa,
   .stn-block {
     background: #fff !important;
@@ -245,7 +282,6 @@ input:focus-visible {
     box-shadow: none !important;
   }
 
-  /* Page break handling for long reports */
   section,
   .qa,
   .stn-block,
@@ -255,19 +291,16 @@ input:focus-visible {
     margin-bottom: 24px;
   }
 
-  /* Make long text answers more readable */
   .lt-answer {
     white-space: pre-wrap;
     font-size: 14px;
   }
 
-  /* Optional: remove disclosure arrows from Text Answers */
   .lt-summary::before {
     content: "";
   }
 }
 
-/* Hide the print header on screen */
 @media screen {
   .print-only-report-header {
     display: none;

@@ -53,6 +53,10 @@ function renderTeamButtons(data) {
       setStatus('Choose a respondent or click "Load Vertical Report".');
       // Clear header until a report is actually loaded
       setPrintHeader('');
+
+      // Hide floating button proactively on tab switch
+      const fp = document.getElementById("floatingPrintBtn");
+      if (fp) fp.hidden = true;
     });
 
     container.appendChild(btn);
@@ -67,6 +71,9 @@ function renderTeamButtons(data) {
       }
       setStatus('Choose a respondent or click "Load Vertical Report".');
       setPrintHeader('');
+
+      const fp = document.getElementById("floatingPrintBtn");
+      if (fp) fp.hidden = true;
     });
   }
 
@@ -219,4 +226,8 @@ export async function loadTeamAnswers(verticalChoice) {
   );
 
   setStatus(`Team chart updated. (${rows.length.toLocaleString()} records)`);
+
+  // SHOW floating print button
+  const fp = document.getElementById("floatingPrintBtn");
+  if (fp) fp.hidden = false;
 }
