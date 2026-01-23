@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -30,17 +31,19 @@
       outline: none !important;
       filter: none !important;
     }
+
     #team-button-bar .team-tab,
     #team-button-bar .team-tab * {
       background: transparent !important;
       background-color: transparent !important;
     }
   </style>
-
+  <button id="exportToPDF" class="sr-only" aria-hidden="true">Export PDF</button>
   <!-- Consider pinning Chart.js to a specific version in production -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script type="module" src="assets/js/index.js"></script>
 </head>
+
 <body>
 
   <main>
@@ -54,18 +57,9 @@
       <div id="respondentDropdown" class="control-group">
         <div id="respondentCombo" class="combo" aria-label="Respondent filter">
           <label for="respondentFilter" class="sr-only">Select respondent</label>
-          <input
-            id="respondentFilter"
-            type="search"
-            placeholder="Select a respondent from the list…"
-            autocomplete="off"
-            aria-label="Select respondent"
-            role="combobox"
-            aria-autocomplete="list"
-            aria-expanded="false"
-            aria-haspopup="listbox"
-            aria-controls="respondentList"
-          />
+          <input id="respondentFilter" type="search" placeholder="Select a respondent from the list…" autocomplete="off"
+            aria-label="Select respondent" role="combobox" aria-autocomplete="list" aria-expanded="false"
+            aria-haspopup="listbox" aria-controls="respondentList" />
           <div id="respondentPanel" class="combo-panel" hidden>
             <ul id="respondentList" role="listbox" tabindex="-1" aria-label="Respondents"></ul>
           </div>
@@ -89,4 +83,5 @@
     </section>
   </main>
 </body>
+
 </html>

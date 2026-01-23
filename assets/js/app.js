@@ -30,3 +30,15 @@ export async function start() {
     setStatus(`Initialization failed: ${e.message}`);
   }
 }
+
+
+// Expose global PDF export (can be called by browser bookmarklet or console)
+export function exportPDF() {
+  // Allow Chart.js animations to finish rendering
+  setTimeout(() => {
+    window.print();
+  }, 150);
+}
+
+// Wire hidden button for internal use
+document.getElementById("exportToPDF")?.addEventListener("click", exportPDF);
