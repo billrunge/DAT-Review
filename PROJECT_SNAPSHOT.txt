@@ -1,0 +1,1986 @@
+# Project Snapshot
+Generated: 2026-01-23T15:41:21Z
+Commit: 026e3de
+
+----- BEGIN FILE: assets/css/bar-theme.css -----
+(sha1: afc71031800933e51fcef77aeb0059fc4477257c)
+
+
+:root{ --font-sans:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif; --canvas:#f6f7fb; --surface-1:#fff; --surface-2:#fbfcff; --border:#e5e8f0; --text:#0f172a; --text-muted:#475569; --brand:#2b5eff; --brand-alpha-20:rgba(43,94,255,.20); --proc-underline:#ff8a00; --radius:12px; --radius-sm:10px; --shadow-sm:0 1px 2px rgba(2,6,23,.04); --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:24px; --focus-ring:color-mix(in oklab, var(--brand) 40%, transparent); }
+body{ font-family:var(--font-sans); color:var(--text); background:var(--canvas); margin:0; }
+.app-bar{ display:none; }
+
+----- END FILE: assets/css/bar-theme.css -----
+
+----- BEGIN FILE: assets/css/base.css -----
+(sha1: 68145898917b3f23687a6169b8618d3907430a7a)
+
+
+/* assets/css/base.css */
+
+/* ===== CSS Tokens (Light theme) ===== */
+:root {
+  --border: #d1d5db;
+  --bg: #ffffff;
+  --bg-muted: #f9fafb;
+  --bg-hover: #f3f4f6;
+  --text: #111827;
+
+  --primary: #2563eb;
+  --primary-alpha: #2563eb22;
+
+  --radius: 8px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+
+  --shadow: 0 8px 16px rgba(0,0,0,.06);
+
+  /* Typography for charts and UI */
+  --font-sans: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+  /* ===== Used by Chart.js tooltip ===== */
+  --tooltip-bg: #ffffff; /* light surface chip */
+}
+
+/* ===== CSS Tokens (Dark theme) ===== */
+:root[data-theme="dark"] {
+  --text: #e5e7eb;
+  --bg: #0b1020;
+  --bg-muted: #0f172a;
+  --bg-hover: #111827;
+  --border: #334155;
+
+  --shadow: 0 8px 16px rgba(0,0,0,.30);
+
+  /* Tooltip should be slightly lighter than page bg for contrast */
+  --tooltip-bg: #111827;
+}
+
+/* ===== Global Resets & Base ===== */
+* { box-sizing: border-box; }
+
+body {
+  font: 14px/1.5 var(--font-sans);
+  color: var(--text);
+  background: var(--bg);
+  margin: 0;
+  padding: var(--space-5);
+}
+
+/* Hidden headers for accessibility */
+.sr-only,
+.stn-visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0,0,0,0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Page layout primitives */
+.page-header,
+.page-footer { margin-block: var(--space-4); }
+
+.controls { margin-block: var(--space-4); }
+
+.control-group {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+label { font-weight: 600; }
+
+/* Inputs & buttons (tabs may style themselves separately) */
+input,
+button {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: var(--bg-muted);
+  color: var(--text);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition:
+    background 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+/* Text inputs */
+input[type="search"] {
+  background: var(--bg);
+  cursor: text;
+}
+
+/* Hover (exclude custom-styled tab buttons) */
+button:hover:not(.team-tab) {
+  background: var(--bg-hover);
+  border-color: #9ca3af;
+}
+
+/* Accessible focus */
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid color-mix(in oklab, var(--primary) 40%, transparent);
+  outline-offset: 2px;
+}
+
+/* Helpful layout niceties */
+.chart-container {
+  width: min(100%, 900px);
+  margin: 0 auto;
+}
+
+/* ===== Strengths & Training Needs (team) — optional styling ===== */
+.stn-section { margin-top: var(--space-5); }
+.stn-header {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+.stn-title { font-weight: 700; }
+.stn-subtitle { opacity: .75; }
+
+.stn-grid {
+  display: grid; gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+.stn-block {
+  border: 1px solid var(--border);
+  background: var(--bg-muted);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  box-shadow: var(--shadow);
+}
+.stn-list { list-style: none; margin: 0; padding: 0; }
+.stn-list li {
+  display: flex; align-items: baseline; justify-content: space-between;
+  padding: 6px 0; border-bottom: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+}
+.stn-list li:last-child { border-bottom: 0; }
+.stn-question { inline-size: 70%; }
+.stn-metric { font-variant-numeric: tabular-nums; font-weight: 600; margin-left: 8px; }
+.stn-count { opacity: .65; margin-left: 8px; }
+
+.stn-empty { opacity: .7; margin: 0; }
+
+----- END FILE: assets/css/base.css -----
+
+----- BEGIN FILE: assets/css/components.css -----
+(sha1: 4373d0c0c167a7061f21810957190189a5aad18c)
+
+
+/* buttons */
+.btn{ display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--surface-1); color:var(--text); font-weight:600; cursor:pointer; }
+.btn--primary{ background:var(--brand); color:#fff; }
+.btn--primary:hover{ box-shadow:0 0 0 3px var(--brand-alpha-20); }
+.btn--secondary:hover{ background:color-mix(in oklab, var(--brand) 6%, var(--surface-1)); }
+/* tabs */
+.team-tabs{ display:flex; gap:var(--space-4); border-bottom:1px solid var(--border); margin-bottom:var(--space-4); padding:0 var(--space-1); background:transparent; overflow-x:auto; }
+.team-tab{ appearance:none; border:none; padding:var(--space-3) var(--space-1); font-size:.95rem; font-weight:600; color:var(--text-muted); cursor:pointer; background:transparent!important; background-image:none!important; background-repeat:no-repeat; background-position:left 100%; background-size:0 0; border-radius:0; transition:none!important; }
+.team-tab:not(.active):hover{ background:transparent!important; background-image:none!important; color:var(--text-muted)!important; }
+.team-tab.active, .team-tab[aria-selected="true"], .team-tab.active:hover, .team-tab[aria-selected="true"]:hover, .team-tab.active:focus, .team-tab[aria-selected="true"]:focus, .team-tab.active:focus-visible, .team-tab[aria-selected="true"]:focus-visible{
+  background:transparent!important; background-color:transparent!important; color:var(--text)!important;
+  background-image:linear-gradient(var(--proc-underline), var(--proc-underline))!important; background-size:100% 2px!important; background-position:left 100%!important; box-shadow:none!important; filter:none!important;
+}
+.team-tab:focus-visible{ outline:3px solid var(--focus-ring); outline-offset:2px; }
+#team-button-bar .team-tab, #team-button-bar .team-tab:hover, #team-button-bar .team-tab:focus, #team-button-bar .team-tab:focus-visible, #team-button-bar .team-tab:active{ background:transparent!important; background-color:transparent!important; box-shadow:none!important; filter:none!important; border:0!important; }
+#team-button-bar .team-tab.active, #team-button-bar .team-tab[aria-selected="true"], #team-button-bar .team-tab.active:hover, #team-button-bar .team-tab.active:focus, #team-button-bar .team-tab.active:focus-visible, #team-button-bar .team-tab[aria-selected="true"]:hover, #team-button-bar .team-tab[aria-selected="true"]:focus, #team-button-bar .team-tab[aria-selected="true"]:focus-visible{
+  background:transparent!important; background-color:transparent!important; background-image:linear-gradient(var(--proc-underline), var(--proc-underline))!important; background-size:100% 2px!important; background-position:left 100%!important; color:var(--text)!important;
+}
+#team-button-bar .team-tab, #team-button-bar .team-tab.active, #team-button-bar .team-tab[aria-selected="true"]{ background-repeat:no-repeat!important; }
+/* combobox */
+.combo{ position:relative; display:inline-block; min-width:280px; max-width:360px; }
+.combo input[type="search"]{ width:100%; border-radius:var(--radius-sm); }
+.combo.open input[type="search"]{ border-bottom-left-radius:0; border-bottom-right-radius:0; }
+.combo-panel{ position:absolute; left:0; right:0; margin-top:-1px; background:var(--surface-1); border:1px solid var(--border); border-top:none; border-bottom-left-radius:var(--radius-sm); border-bottom-right-radius:var(--radius-sm); box-shadow:var(--shadow-sm); z-index:10; max-height:260px; overflow-y:auto; }
+#respondentList{ list-style:none; margin:0; padding:4px; }
+#respondentList li[role="option"]{ padding:8px 10px; border-radius:8px; cursor:pointer; }
+#respondentList li[role="option"]:hover, #respondentList li[aria-selected="true"], #respondentList li.active{ background:var(--brand-alpha-20); }
+#respondentList li.empty{ color:var(--text-muted); }
+/* mc */
+.mc-count-badge{ display:inline-block; margin-left:8px; padding:2px 10px; border-radius:999px; font-size:.85rem; font-weight:700; background:var(--brand-alpha-20); color:var(--brand); }
+#multichoice-answer-list ul{ list-style:disc; padding-left:1.4rem; }
+#multichoice-answer-list li{ margin:4px 0; }
+
+----- END FILE: assets/css/components.css -----
+
+----- BEGIN FILE: assets/css/longtext.css -----
+(sha1: 783ac1e147cbe7cddd6a390d2a9c56d7782d8a24)
+
+
+#longtext-section{ margin-top:var(--space-5); }
+#longtext-section h2{ margin-bottom:var(--space-3); font-size:1.25rem; font-weight:700; }
+.longtext-answer-container{ display:grid; gap:var(--space-4); margin-top:var(--space-4); margin-bottom:var(--space-5); }
+.lt-item{ border:1px solid var(--border); border-radius:var(--radius); background:var(--surface-2); box-shadow:var(--shadow-sm); overflow:hidden; }
+.lt-summary{ display:flex; align-items:center; gap:var(--space-2); padding:var(--space-3) var(--space-4); font-weight:700; cursor:pointer; }
+.lt-summary::before{ content:"▸"; margin-right:6px; }
+details[open] .lt-summary::before{ content:"▾"; }
+.lt-answer{ padding:var(--space-3) var(--space-4) var(--space-4); background:var(--surface-1); border-top:1px solid var(--border); white-space:pre-wrap; }
+.lt-toolbar{ display:inline-flex; gap:var(--space-2); }
+.lt-toolbar button{ padding:var(--space-1) var(--space-3); font-size:.9rem; }
+
+----- END FILE: assets/css/longtext.css -----
+
+----- BEGIN FILE: assets/css/score-changes.css -----
+(sha1: 58fc334867a0d806899a51724197ec75b4bbdda9)
+
+
+#score-change-section{ margin-top:var(--space-5); }
+#score-change-section h2{ margin-bottom:var(--space-3); font-size:1.25rem; font-weight:700; }
+#score-change-section h3, #extremes-section-header{ margin:var(--space-3) 0 var(--space-2); font-size:1rem; font-weight:700; }
+.sc-row{ display:flex; justify-content:space-between; gap:12px; }
+.sc-question{ flex:1; min-width:0; line-height:1.45; }
+.sc-badge{ display:inline-flex; align-items:center; gap:4px; padding:2px 10px; border-radius:999px; font-size:.85rem; font-weight:700; line-height:1.3; }
+.sc-up{ background:#e7f3ff; color:#0b4dd6; }
+.sc-down{ background:#ffecec; color:#a31212; }
+.qa{ border:1px solid var(--border); border-radius:var(--radius); background:var(--surface-2); padding:var(--space-5); box-shadow:var(--shadow-sm); }
+
+----- END FILE: assets/css/score-changes.css -----
+
+----- BEGIN FILE: assets/js/app.js -----
+(sha1: 8ff262c58f0857bc938234d3dbf335163228b272)
+
+import { initCombobox, clearRespondentSelection } from "./ui/combobox.js";
+import { loadVerticals, loadTeamAnswers } from "./features/verticalReport.js";
+import { els } from "./core/domRefs.js";
+import { setStatus } from "./utils.js";
+import { clearReportAreas } from "./ui/chart.js";
+export async function start() {
+  try {
+    await initCombobox();
+    await loadVerticals();
+    els.loadVerticalBtn?.addEventListener("click", () => {
+      const active = els.teamBar?.querySelector("button.team-tab.active");
+      if (!active || !active.dataset.choiceGuid) {
+        setStatus("Please select a vertical first.");
+        els.teamBar?.focus();
+        return;
+      }
+      const sel = {
+        guid: active.dataset.choiceGuid,
+        artifactId: Number(active.dataset.artifactId) || null,
+        name: active.dataset.label || "",
+      };
+      clearRespondentSelection();
+      clearReportAreas();
+      loadTeamAnswers(sel).catch((e) =>
+        setStatus(`Failed to load team answers: ${e.message}`),
+      );
+    });
+    setStatus("Ready.");
+  } catch (e) {
+    setStatus(`Initialization failed: ${e.message}`);
+  }
+}
+
+----- END FILE: assets/js/app.js -----
+
+----- BEGIN FILE: assets/js/core/config.js -----
+(sha1: 5a3a93e691a474071f153412356d369f8c021172)
+
+export function getWorkspaceId(){ const p=new URLSearchParams(window.top.location.search); return p.get('AppID'); }
+
+----- END FILE: assets/js/core/config.js -----
+
+----- BEGIN FILE: assets/js/core/constants.js -----
+(sha1: bb4c1c2ee2d7b92d73f6df2af7fece925d7ac179)
+
+export const ROUTES = {
+  querySlim: (wsId) =>
+    `/Relativity.Rest/api/Relativity.ObjectManager/v1/workspace/${wsId}/object/queryslim`,
+  choiceParents: (wsId) =>
+    `/relativity.rest/api/relativity-object-model/v1/workspaces/${wsId}/choices/parents`,
+};
+export const GUIDS = {
+  ENTITY: "d216472d-a1aa-4965-8b36-367d43d4e64c",
+  ANSWER_OBJ: "ebf38f2e-2654-460b-bf57-6dcd5ae64b89",
+  DAT_OBJ: "c0554960-49cf-431d-9853-df4be5cddb74",
+  FULL_NAME: "57928ef5-f29d-4137-a215-3a9ab3e3f82",
+  QUESTION_ID: "141ae10a-b8f9-4df1-a46e-715901531f1c",
+  QUESTION_TEXT: "d2df17af-55e4-440c-a357-04971ce6b797",
+  SINGLE_CHOICE: "f1909ec6-3a46-4e25-a198-b438da368eb2",
+  YES_NO: "1801725a-7fd3-46b7-9acc-1131ba0bc22c",
+  MULTI_CHOICE: "da29644f-3dee-4e76-8128-21c23790b964",
+  LONG_TEXT: "19ab3c19-970d-46f3-b6bd-f905ad3edc1a",
+  DAT: "921ca4eb-459c-47b1-ae1c-20aed2c69b84",
+  RESPONDENT_REF: "69bade15-46c0-44e5-a1ec-ea404317869b",
+  DAT_NAME: "70df54b0-b1f3-45fc-a64f-e03d2aae09b0",
+  TYPE_SINGLE: "0c340d4f-9a6f-43a0-a021-8f1ae3b6818c",
+  TYPE_YESNO: "50786d8a-52ef-4267-acaf-24e52fb80ce0",
+  TYPE_MULTI: "c52db31e-80b8-4b04-bbe5-d1f8fa12b550",
+  TYPE_LONGTEXT: "c7a77335-ed71-4d59-890d-bebf7865793e",
+  VERTICALS_FIELD: "4a25ec45-6660-4b2d-aadc-9f067d4c651d",
+};
+
+----- END FILE: assets/js/core/constants.js -----
+
+----- BEGIN FILE: assets/js/core/domRefs.js -----
+(sha1: e430eb9c14554767522c7e306fb678f750e03596)
+
+export const els={
+  combo:document.getElementById('respondentCombo'),
+  input:document.getElementById('respondentFilter'),
+  panel:document.getElementById('respondentPanel'),
+  list:document.getElementById('respondentList'),
+  teamBar:document.getElementById('team-button-bar'),
+  loadVerticalBtn:document.getElementById('loadVerticalBtn'),
+  chartCanvas:document.getElementById('answersChart'),
+  chartStatus:document.getElementById('chartStatus'),
+  multiList:document.getElementById('multichoice-answer-list'),
+  mcSection:document.getElementById('mc-section'),
+  pageHeader:document.getElementById('pageHeader'),
+};
+
+----- END FILE: assets/js/core/domRefs.js -----
+
+----- BEGIN FILE: assets/js/core/graph.js -----
+(sha1: 35b0ededc71a1995f6808820e856906902a0c47c)
+
+import { fetchJson } from "../core/http.js";
+import { ROUTES } from "../core/constants.js";
+
+/**
+ * Fetches *all* pages of Object Manager QuerySlim results.
+ * Handles both { Objects, TotalCount } and { Data: { Objects, TotalCount } } shapes.
+ */
+export async function fetchAllQuerySlim(
+  workspaceId,
+  baseRequest,
+  pageSize = 1000,
+) {
+  const url = ROUTES.querySlim(workspaceId);
+  const getObjects = (resp) => resp?.Objects ?? resp?.Data?.Objects ?? [];
+  const getTotal = (resp, fallback) =>
+    typeof resp?.TotalCount === "number"
+      ? resp.TotalCount
+      : typeof resp?.Data?.TotalCount === "number"
+        ? resp.Data.TotalCount
+        : fallback;
+
+  let start = 1;
+  let totalCount = Infinity;
+  const all = [];
+
+  while (start <= totalCount) {
+    const body = { ...baseRequest, start, length: pageSize };
+    const resp = await fetchJson(url, {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+
+    const objects = getObjects(resp);
+    const pageCount = objects.length;
+
+    if (!Number.isFinite(totalCount)) {
+      totalCount = getTotal(resp, start + pageCount - 1);
+      if (!Number.isFinite(totalCount) || totalCount < 0)
+        totalCount = Number.POSITIVE_INFINITY;
+    }
+
+    if (pageCount === 0) break;
+
+    all.push(...objects);
+
+    if (!Number.isFinite(totalCount)) {
+      if (pageCount < pageSize) break;
+    } else if (all.length >= totalCount) {
+      break;
+    }
+
+    start += pageCount;
+  }
+
+  return all;
+}
+
+----- END FILE: assets/js/core/graph.js -----
+
+----- BEGIN FILE: assets/js/core/http.js -----
+(sha1: c8dae27eecdc153ff83a48cff7540eabe03f5833)
+
+export async function fetchJson(url, options, timeoutMs = 30000) {
+  const ctrl = new AbortController();
+  const id = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Header": "-",
+        ...(options?.headers || {}),
+      },
+      signal: ctrl.signal,
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return await res.json();
+  } finally {
+    clearTimeout(id);
+  }
+}
+
+----- END FILE: assets/js/core/http.js -----
+
+----- BEGIN FILE: assets/js/features/respondentReport.js -----
+(sha1: e95fd3ff69476b62e63cc0bc2895ad9cec73d55b)
+
+import { els } from "../core/domRefs.js";
+import { GUIDS } from "../core/constants.js";
+import { fetchAllQuerySlim } from "../core/graph.js";
+import { getWorkspaceId } from "../core/config.js";
+import { mapAnswer, normalizeQuestion, setStatus } from "../utils.js";
+import { replaceChartData } from "../ui/chart.js";
+import { loadRespondentMultiChoiceAnswers } from "../ui/multiChoice.js";
+import { loadRespondentLongTextAnswers } from "../ui/longText.js";
+import { renderScoreChanges } from "../ui/scoreChanges.js";
+import { getSelectedRespondentId } from "../ui/combobox.js";
+export async function loadRespondentAnswers() {
+  if (els.mcSection) els.mcSection.hidden = true;
+  const sc = document.getElementById("score-change-section");
+  if (sc) sc.hidden = true;
+  const lt = document.getElementById("longtext-section");
+  if (lt) lt.hidden = true;
+  if (els.pageHeader) els.pageHeader.hidden = true;
+  const id = getSelectedRespondentId();
+  if (!id) {
+    setStatus("Please choose a respondent.");
+    els.input.focus();
+    return;
+  }
+  setStatus("Loading respondent chart…");
+  const ws = getWorkspaceId();
+  const base = {
+    Request: {
+      ObjectType: { GUID: GUIDS.ANSWER_OBJ },
+      fields: [
+        { GUID: GUIDS.QUESTION_ID },
+        { GUID: GUIDS.SINGLE_CHOICE },
+        { GUID: GUIDS.DAT },
+        { GUID: GUIDS.YES_NO },
+        { GUID: GUIDS.QUESTION_TEXT },
+      ],
+      condition:
+        `'Respondent' IN OBJECT [${id}] AND ` +
+        `'Question::Answer Type' == CHOICE ${GUIDS.TYPE_SINGLE} ` +
+        `OR 'Question::Answer Type' == CHOICE ${GUIDS.TYPE_YESNO}`,
+      sorts: [{ Direction: "Ascending", FieldIdentifier: { GUID: GUIDS.DAT } }],
+    },
+  };
+  const rows = await fetchAllQuerySlim(ws, base, 1000);
+  const periods = [
+    ...new Set(rows.map((r) => r.Values?.[2]?.Name).filter(Boolean)),
+  ];
+  const earliest = periods[0];
+  const latest = periods[periods.length - 1];
+  const series = {},
+    qTextMap = {};
+  rows.forEach((r) => {
+    const q = r.Values?.[0]?.Name;
+    const qt = normalizeQuestion(r.Values?.[4]?.Name ?? r.Values?.[4] ?? q);
+    const p = r.Values?.[2]?.Name;
+    const raw = r?.Values?.[1]?.Name ?? r?.Values?.[3]?.Name ?? 0;
+    if (!q || !p) return;
+    series[q] ??= {};
+    series[q][p] = mapAnswer(raw);
+    if (qt && !qTextMap[q]) qTextMap[q] = qt;
+  });
+  const eligible = Object.keys(series).filter((q) =>
+    periods.every((p) => series[q][p] !== undefined),
+  );
+  const totals = periods.map((p) =>
+    eligible.reduce((s, q) => {
+      const v = series[q][p];
+      return Number.isFinite(v) ? s + v : s;
+    }, 0),
+  );
+  replaceChartData(periods, totals);
+  const changes = [];
+  Object.keys(series).forEach((q) => {
+    const f = series[q][earliest];
+    const t = series[q][latest];
+    if (!Number.isFinite(f) || !Number.isFinite(t)) return;
+    changes.push({
+      qId: q,
+      qText: qTextMap[q] ?? q,
+      from: f,
+      to: t,
+      delta: t - f,
+    });
+  });
+  renderScoreChanges(
+    changes.filter((c) => c.delta > 0).sort((a, b) => b.delta - a.delta),
+    changes.filter((c) => c.delta < 0).sort((a, b) => a.delta - b.delta),
+    earliest,
+    latest,
+    5,
+  );
+  renderExtremes(rows, series, periods, qTextMap);
+  await loadRespondentMultiChoiceAnswers(id);
+  await loadRespondentLongTextAnswers(id);
+  setStatus(`Chart updated. (${rows.length.toLocaleString()} records)`);
+}
+function renderExtremes(rows, series, periods, map) {
+  const types = new Map();
+  rows.forEach((r) => {
+    const q = r.Values?.[0]?.Name;
+    if (!q) return;
+    const s = r.Values?.[1]?.Name !== undefined;
+    const y = r.Values?.[3]?.Name !== undefined;
+    const t = types.get(q) || { single: false, yesno: false };
+    if (s) t.single = true;
+    if (y) t.yesno = true;
+    types.set(q, t);
+  });
+  const sc = [...types.entries()]
+    .filter(([, t]) => t.single === true && t.yesno !== true)
+    .map(([q]) => q);
+  const out = [];
+  sc.forEach((q) => {
+    const vals = periods
+      .map((p) => series[q]?.[p])
+      .filter((v) => Number.isFinite(v));
+    if (!vals.length) return;
+    const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+    out.push({ qId: q, qText: map[q] ?? q, avg });
+  });
+  if (!out.length) return;
+  out.sort((a, b) => a.avg - b.avg);
+  const lowest = out.slice(0, 5);
+  const highest = out.slice(-5).reverse();
+  const anchor =
+    document.getElementById("score-change-section") || els.mcSection;
+  const parent = anchor?.parentNode || document.body;
+  const prevS = document.getElementById("extremes-section");
+  const prevH = document.getElementById("extremes-section-header");
+  if (prevS) prevS.remove();
+  if (prevH) prevH.remove();
+  const header = document.createElement("h3");
+  header.id = "extremes-section-header";
+  header.textContent = "Respondent Strengths & Training Needs";
+  const card = document.createElement("section");
+  card.id = "extremes-section";
+  card.className = "qa";
+  const make = (t, items, up) => {
+    const h3 = document.createElement("h3");
+    h3.textContent = t;
+    card.appendChild(h3);
+    const ul = document.createElement("ul");
+    items.forEach((it) => {
+      const li = document.createElement("li");
+      const row = document.createElement("div");
+      row.className = "sc-row";
+      const q = document.createElement("span");
+      q.className = "sc-question";
+      q.textContent = it.qText;
+      const b = document.createElement("span");
+      b.className = `sc-badge ${up ? "sc-up" : "sc-down"}`;
+      const strong = document.createElement("strong");
+      strong.textContent = it.avg.toFixed(2);
+      const sub = document.createElement("span");
+      sub.className = "sc-sub";
+      sub.textContent = " avg";
+      b.appendChild(strong);
+      b.appendChild(sub);
+      row.appendChild(q);
+      row.appendChild(b);
+      li.appendChild(row);
+      ul.appendChild(li);
+    });
+    card.appendChild(ul);
+  };
+  make("Needs More Training (Lowest)", lowest, false);
+  make("Confident / Potential SME (Highest)", highest, true);
+  if (anchor) {
+    parent.insertBefore(header, anchor.nextSibling);
+    parent.insertBefore(card, header.nextSibling);
+  } else {
+    parent.appendChild(header);
+    parent.appendChild(card);
+  }
+}
+
+----- END FILE: assets/js/features/respondentReport.js -----
+
+----- BEGIN FILE: assets/js/features/teamMultiChoiceAgg.js -----
+(sha1: 22bc46cb87d7ce726a05abe3e0403d0d5053cf95)
+
+
+import { els } from '../core/domRefs.js';
+import { GUIDS } from '../core/constants.js';
+import { fetchAllQuerySlim } from '../core/graph.js';
+import { getWorkspaceId } from '../core/config.js';
+import { normalizeQuestion, compareDatNames } from '../utils.js';
+
+function aggregate(rows) {
+  const periodsSet = new Set();
+  const byQuestion = new Map();
+  rows.forEach(obj => {
+    const v = obj?.Values ?? [];
+    const qRaw = v[0] ?? '';
+    const question = normalizeQuestion(qRaw) || '(Untitled question)';
+    const datName = v[2]?.Name ?? '';
+    const choices = Array.isArray(v[1]) ? v[1] : [];
+    if (!datName) return;
+
+    periodsSet.add(datName);
+
+    if (!byQuestion.has(question)) byQuestion.set(question, new Map());
+    const perDat = byQuestion.get(question);
+    if (!perDat.has(datName)) perDat.set(datName, new Map());
+    const counts = perDat.get(datName);
+
+    for (const ch of choices) {
+      const name = ch?.Name ?? '(unnamed)';
+      counts.set(name, (counts.get(name) ?? 0) + 1);
+    }
+  });
+
+  const periods = Array.from(periodsSet);
+  periods.sort(compareDatNames);
+  return { periods, byQuestion };
+}
+
+function renderAggregated({ periods, byQuestion }) {
+  const mount = els.multiList;
+  mount.innerHTML = '';
+  let rendered = 0;
+
+  for (const [question, perDat] of byQuestion.entries()) {
+    const section = document.createElement('section');
+    section.className = 'qa';
+
+    const h4 = document.createElement('h4');
+    h4.textContent = question || '(Untitled question)';
+    section.appendChild(h4);
+
+    const row = document.createElement('div');
+    row.className = 'dat-row';
+
+    periods.forEach(dat => {
+      const col = document.createElement('div');
+      col.className = 'dat-col';
+
+      const datEl = document.createElement('div');
+      datEl.className = 'dat';
+      datEl.textContent = dat || '(not set)';
+      col.appendChild(datEl);
+
+      const counts = perDat.get(dat);
+      if (counts && counts.size > 0) {
+        const items = Array.from(counts.entries()).sort((a, b) => {
+          if (b[1] !== a[1]) return b[1] - a[1];
+          return String(a[0]).localeCompare(String(b[0]), undefined, { sensitivity: 'base' });
+        });
+
+        const ul = document.createElement('ul');
+        for (const [choiceName, n] of items) {
+          const li = document.createElement('li');
+          const nameSpan = document.createElement('span');
+          nameSpan.textContent = choiceName;
+
+          const countSpan = document.createElement('span');
+          countSpan.className = 'mc-count-badge';
+          countSpan.textContent = n;
+
+          li.appendChild(nameSpan);
+          li.appendChild(countSpan);
+          ul.appendChild(li);
+        }
+        col.appendChild(ul);
+        rendered++;
+      } else {
+        const empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.textContent = 'No answers provided.';
+        col.appendChild(empty);
+      }
+
+      row.appendChild(col);
+    });
+
+    section.appendChild(row);
+    mount.appendChild(section);
+  }
+
+  if (els.mcSection) {
+    els.mcSection.hidden = byQuestion.size === 0 || rendered === 0;
+  }
+}
+
+export async function loadTeamMultiChoiceAnswers(verticalChoiceGuid) {
+  const wsId = getWorkspaceId();
+
+  // ✅ FIX: build the condition with safe spacing
+  const parts = [
+    `'Question::Answer Type' == CHOICE ${GUIDS.TYPE_MULTI}`,
+    `'Question::Verticals' == CHOICE ${verticalChoiceGuid}`
+  ];
+  const condition = parts.join(' AND ');
+
+  const base = {
+    Request: {
+      ObjectType: { GUID: GUIDS.ANSWER_OBJ },
+      fields: [
+        { GUID: GUIDS.QUESTION_TEXT },  // [0]
+        { GUID: GUIDS.MULTI_CHOICE },   // [1]
+        { GUID: GUIDS.DAT }             // [2]
+      ],
+      condition,
+      sorts: [{ Direction: 'Ascending', FieldIdentifier: { GUID: GUIDS.DAT } }]
+    }
+  };
+
+  const rows = await fetchAllQuerySlim(wsId, base, 1000);
+  const agg = aggregate(rows);
+  renderAggregated(agg);
+}
+
+----- END FILE: assets/js/features/teamMultiChoiceAgg.js -----
+
+----- BEGIN FILE: assets/js/features/verticalReport.js -----
+(sha1: dd32268a07ccfcc2017d69d2140000bf0d30e973)
+
+
+// assets/js/features/verticalReport.js
+import { els } from '../core/domRefs.js';
+import { GUIDS, ROUTES } from '../core/constants.js';
+import { fetchJson } from '../core/http.js';
+import { getWorkspaceId } from '../core/config.js';
+import { fetchAllQuerySlim } from '../core/graph.js';
+import { mapAnswer, setStatus, normalizeQuestion } from '../utils.js';
+import { replaceChartData, clearReportAreas } from '../ui/chart.js';
+import { renderScoreChanges } from '../ui/scoreChanges.js';
+import { reloadRespondentsForVertical } from '../ui/combobox.js';
+// NEW: strengths section for teams
+import { renderTeamStrengths } from '../ui/teamStrengths.js';
+
+/**
+ * Load vertical (choice parent) buttons and wire up tab behavior.
+ * Exports: loadVerticals()
+ */
+export async function loadVerticals() {
+  const wsId = getWorkspaceId();
+
+  // Get the list of vertical Choice Parents
+  const body = { FieldIdentifier: { Guids: [GUIDS.VERTICALS_FIELD] } };
+  const data = await fetchJson(ROUTES.choiceParents(wsId), {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+
+  // Sort A→Z for stable UX
+  data.sort((a, b) => (a?.Name ?? '').localeCompare(b?.Name ?? '', undefined, { sensitivity: 'base' }));
+
+  renderTeamButtons(data);
+}
+
+/**
+ * Render the vertical tab strip and wire up click/keyboard behavior.
+ */
+function renderTeamButtons(data) {
+  const container = els.teamBar;
+  container.innerHTML = '';
+  container.classList.add('team-tabs');
+  container.setAttribute('role', 'tablist');
+  container.setAttribute('aria-label', 'Verticals');
+
+  (data ?? []).forEach((team) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'team-tab';
+    btn.setAttribute('role', 'tab');
+    btn.setAttribute('aria-selected', 'false');
+    btn.tabIndex = -1;
+
+    const choiceGuid = team.Guids?.[0] ?? '';
+    btn.dataset.choiceGuid = choiceGuid;
+    btn.dataset.artifactId = team.ArtifactID ?? '';
+    btn.dataset.label = team.Name ?? '';
+    btn.textContent = team.Name;
+
+    btn.addEventListener('click', async () => {
+      setActiveTab(container, btn);
+      clearReportAreas();
+      if (btn.dataset.choiceGuid) {
+        await reloadRespondentsForVertical(btn.dataset.choiceGuid);
+      }
+      setStatus('Choose a respondent or click "Load Vertical Report".');
+    });
+
+    container.appendChild(btn);
+  });
+
+  // Activate first tab by default and pre-load its respondent list
+  const first = container.querySelector('button[role="tab"]');
+  if (first) {
+    setActiveTab(container, first);
+    requestAnimationFrame(async () => {
+      if (first.dataset.choiceGuid) {
+        await reloadRespondentsForVertical(first.dataset.choiceGuid);
+      }
+      setStatus('Choose a respondent or click "Load Vertical Report".');
+    });
+  }
+
+  // Keyboard support (Left/Right)
+  container.addEventListener('keydown', (e) => {
+    const tabs = [...container.querySelectorAll('button[role="tab"]')];
+    const active = container.querySelector('button.active');
+    const i = tabs.indexOf(active);
+    if (e.key === 'ArrowRight') tabs[i + 1]?.click();
+    if (e.key === 'ArrowLeft') tabs[i - 1]?.click();
+  });
+}
+
+function setActiveTab(container, newActive) {
+  container.querySelectorAll('button[role="tab"]').forEach((b) => {
+    b.classList.remove('active');
+    b.setAttribute('aria-selected', 'false');
+    b.tabIndex = -1;
+  });
+  newActive.classList.add('active');
+  newActive.setAttribute('aria-selected', 'true');
+  newActive.tabIndex = 0;
+}
+
+/**
+ * Build the Team (vertical) chart and score changes for SingleChoice + Yes/No,
+ * then load the Team-level MultiChoice aggregation in a separate module.
+ *
+ * Exports: loadTeamAnswers()
+ *
+ * @param {{ guid: string, artifactId?: number|null, name?: string }} verticalChoice
+ */
+export async function loadTeamAnswers(verticalChoice) {
+  if (els.mcSection) els.mcSection.hidden = true;
+  if (els.pageHeader) els.pageHeader.hidden = true;
+
+  setStatus(`Loading team answers for ${verticalChoice?.name ?? 'selected vertical'}…`);
+
+  const wsId = getWorkspaceId();
+
+  // NOTE: This condition already has correct spacing and parentheses.
+  // It includes both SingleChoice and Yes/No, limited to the selected Vertical.
+  const base = {
+    Request: {
+      ObjectType: { GUID: GUIDS.ANSWER_OBJ },
+      fields: [
+        { GUID: GUIDS.QUESTION_ID },    // [0]
+        { GUID: GUIDS.SINGLE_CHOICE },  // [1]
+        { GUID: GUIDS.DAT },            // [2]
+        { GUID: GUIDS.RESPONDENT_REF }, // [3]
+        { GUID: GUIDS.YES_NO },         // [4]
+        { GUID: GUIDS.QUESTION_TEXT },  // [5]  <-- Question Text index
+      ],
+      condition:
+        `('Question::Answer Type' == CHOICE ${GUIDS.TYPE_SINGLE} ` +
+        `OR 'Question::Answer Type' == CHOICE ${GUIDS.TYPE_YESNO}) ` +
+        `AND 'Question::Verticals' == CHOICE ${verticalChoice.guid}`,
+      sorts: [{ Direction: 'Ascending', FieldIdentifier: { GUID: GUIDS.DAT } }],
+    },
+  };
+
+  // Pull all pages
+  const rows = await fetchAllQuerySlim(wsId, base, 1000);
+
+  // Team MultiChoice rendering area should start empty
+  if (els.multiList) els.multiList.innerHTML = '';
+
+  // Build period axis
+  const periods = [...new Set(rows.map((r) => r.Values?.[2]?.Name).filter(Boolean))];
+  const earliest = periods[0];
+  const latest = periods[periods.length - 1];
+
+  // series[qId][respondent][period] = numericValue
+  const series = {};
+  const qTextMap = {};
+
+  rows.forEach((r) => {
+    const qId = r.Values?.[0]?.Name;
+    const single = r.Values?.[1]?.Name;
+    const period = r.Values?.[2]?.Name;
+    const respondent = r.Values?.[3]?.Name;
+    const yesno = r.Values?.[4]?.Name;
+    const qTextRaw = r.Values?.[5]?.Name ?? r.Values?.[5]; // <-- reads [5]
+    const valRaw = single ?? yesno ?? 0;
+
+    if (!qId || !period || !respondent) return;
+
+    series[qId] ??= {};
+    series[qId][respondent] ??= {};
+    series[qId][respondent][period] = mapAnswer(valRaw);
+
+    const qt = normalizeQuestion(qTextRaw ?? qId);
+    if (qt && !qTextMap[qId]) qTextMap[qId] = qt;
+  });
+
+  // Determine fully-covered respondent–question pairs
+  const eligiblePairs = [];
+  Object.keys(series).forEach((qId) => {
+    Object.keys(series[qId]).forEach((resp) => {
+      const map = series[qId][resp];
+      const ok = periods.every((p) => map[p] !== undefined);
+      if (ok) eligiblePairs.push({ qId, resp });
+    });
+  });
+
+  // Chart totals per period
+  const totals = periods.map((p) => {
+    let sum = 0;
+    for (const { qId, resp } of eligiblePairs) {
+      const v = series[qId][resp][p];
+      if (Number.isFinite(v)) sum += v;
+    }
+    return sum;
+  });
+
+  replaceChartData(periods, totals);
+
+  // NEW: strengths & training needs for this team (latest DAT)
+  renderTeamStrengths(rows, { topN: 5, minResponses: 2 });
+
+  // Render Team MultiChoice aggregation
+  import('./teamMultiChoiceAgg.js').then((m) => m.loadTeamMultiChoiceAnswers(verticalChoice.guid));
+
+  // Score changes
+  const changes = [];
+  Object.keys(series).forEach((qId) => {
+    const respondents = Object.keys(series[qId] ?? {});
+    const eligibleRespondents = respondents.filter((resp) =>
+      periods.every((p) => series[qId][resp][p] !== undefined)
+    );
+    if (eligibleRespondents.length === 0) return;
+
+    const avg = (period) => {
+      let sum = 0;
+      let count = 0;
+      for (const resp of eligibleRespondents) {
+        const v = series[qId][resp][period];
+        if (Number.isFinite(v)) {
+          sum += v;
+          count++;
+        }
+      }
+      return count > 0 ? sum / count : NaN;
+    };
+
+    const from = avg(earliest);
+    const to = avg(latest);
+    if (!Number.isFinite(from) || !Number.isFinite(to)) return;
+
+    changes.push({
+      qId,
+      qText: qTextMap[qId] ?? qId,
+      from: Math.round(from * 100) / 100,
+      to: Math.round(to * 100) / 100,
+      delta: Math.round((to - from) * 100) / 100,
+    });
+  });
+
+  renderScoreChanges(
+    changes.filter((c) => c.delta > 0).sort((a, b) => b.delta - a.delta),
+    changes.filter((c) => c.delta < 0).sort((a, b) => a.delta - b.delta),
+    earliest,
+    latest,
+    5
+  );
+
+  setStatus(`Team chart updated. (${rows.length.toLocaleString()} records)`);
+}
+
+----- END FILE: assets/js/features/verticalReport.js -----
+
+----- BEGIN FILE: assets/js/index.js -----
+(sha1: 1b5fd6a1f993bc253a64443c061ae3ff1a96362b)
+
+import { start } from './app.js';
+import { initThemeToggle } from './theme.js';
+initThemeToggle();
+start();
+
+----- END FILE: assets/js/index.js -----
+
+----- BEGIN FILE: assets/js/theme.js -----
+(sha1: 09fab2339e06d523ef16d769d31ba966351cc6b6)
+
+const KEY = "r1-theme";
+const root = document.documentElement;
+function apply(t) {
+  if (t === "dark") {
+    root.setAttribute("data-theme", "dark");
+  } else {
+    root.removeAttribute("data-theme");
+  }
+}
+export function initThemeToggle() {
+  const s = localStorage.getItem(KEY);
+  if (s) apply(s);
+  const b = document.getElementById("themeToggle");
+  if (!b) return;
+  b.addEventListener("click", () => {
+    const n = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    apply(n);
+    localStorage.setItem(KEY, n);
+  });
+}
+
+----- END FILE: assets/js/theme.js -----
+
+----- BEGIN FILE: assets/js/ui/chart.js -----
+(sha1: f7fcee33a0d85c8c5bee184eb201f392bfb1861b)
+
+
+// assets/js/ui/chart.js
+// Centralized Chart.js configuration + helpers used by the DAT Review page.
+// - Theme-aware defaults (colors, fonts, grid, tooltip background)
+// - Shared chart instance helpers
+// - Exposes replaceChartData() and clearReportAreas() expected by feature modules
+// - Wires in clearTeamStrengths() so the new section resets with the page
+
+import { els } from '../core/domRefs.js';
+import { clearTeamStrengths } from './teamStrengths.js';
+
+let chart = null;
+
+/** Read a CSS variable from :root safely. */
+function cssVar(name) {
+  return getComputedStyle(document.documentElement)
+    .getPropertyValue(name)
+    .trim();
+}
+
+/** Build a theme object from your CSS tokens (with fallbacks). */
+function theme() {
+  const text   = cssVar('--text') || '#0f172a';
+  const grid   = cssVar('--border') || '#e5e8f0';
+  const brand  = cssVar('--brand') || '#2b5eff';
+  const brandA = cssVar('--brand-alpha-20') || 'rgba(43,94,255,.20)';
+  const font   = cssVar('--font-sans') ||
+    'system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif';
+  const tooltipBg = cssVar('--tooltip-bg') || cssVar('--bg') || '#ffffff';
+  return { text, grid, brand, brandA, font, tooltipBg };
+}
+
+/** Apply theme settings into global Chart.js defaults. */
+function applyChartDefaults() {
+  const t = theme();
+  if (typeof Chart === 'undefined') return;
+
+  Chart.defaults.color = t.text;
+  Chart.defaults.font.family = t.font;
+
+  // Legend
+  Chart.defaults.plugins.legend = Chart.defaults.plugins.legend || {};
+  Chart.defaults.plugins.legend.labels = Chart.defaults.plugins.legend.labels || {};
+  Chart.defaults.plugins.legend.labels.color = t.text;
+
+  // ✅ Tooltip readability (light/dark)
+  Chart.defaults.plugins.tooltip = Chart.defaults.plugins.tooltip || {};
+  Chart.defaults.plugins.tooltip.enabled = true;
+  Chart.defaults.plugins.tooltip.titleColor = t.text;
+  Chart.defaults.plugins.tooltip.bodyColor  = t.text;
+  Chart.defaults.plugins.tooltip.backgroundColor = t.tooltipBg;
+  Chart.defaults.plugins.tooltip.borderColor     = t.grid;
+  Chart.defaults.plugins.tooltip.borderWidth     = 1;
+  Chart.defaults.plugins.tooltip.padding         = 10;
+  Chart.defaults.plugins.tooltip.displayColors   = true;
+  Chart.defaults.plugins.tooltip.boxWidth        = 8;
+  Chart.defaults.plugins.tooltip.boxHeight       = 8;
+  Chart.defaults.plugins.tooltip.boxPadding      = 4;
+
+  // Scales
+  Chart.defaults.scales = Chart.defaults.scales || {};
+  Chart.defaults.scales.x = Chart.defaults.scales.x || {};
+  Chart.defaults.scales.y = Chart.defaults.scales.y || {};
+  Chart.defaults.scales.x.grid  = { ...(Chart.defaults.scales.x.grid  || {}), color: t.grid };
+  Chart.defaults.scales.x.ticks = { ...(Chart.defaults.scales.x.ticks || {}), color: t.text };
+  Chart.defaults.scales.y.grid  = { ...(Chart.defaults.scales.y.grid  || {}), color: t.grid };
+  Chart.defaults.scales.y.ticks = { ...(Chart.defaults.scales.y.ticks || {}), color: t.text };
+}
+
+/** React to theme changes */
+const themeObserver = new MutationObserver(() => {
+  applyChartDefaults();
+  const c = getChart();
+  if (c) c.update();
+});
+try {
+  themeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+  });
+} catch {}
+
+/** Get current chart instance (if any). */
+function getChart() { return chart || null; }
+
+/** Destroy current chart safely and clear the canvas. */
+export function destroyChart() {
+  const c = getChart();
+  if (c && typeof c.destroy === 'function') c.destroy();
+  chart = null;
+
+  const canvas = els?.chartCanvas || document.getElementById('answersChart');
+  if (canvas && canvas.getContext) {
+    const ctx = canvas.getContext('2d');
+    if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+/** Ensure a single chart instance exists and is configured. */
+export function ensureChart() {
+  if (typeof Chart === 'undefined') {
+    throw new Error('Chart library not loaded.');
+  }
+  if (!chart) {
+    applyChartDefaults();
+    const canvas = els?.chartCanvas || document.getElementById('answersChart');
+    if (!canvas) {
+      console.error('[DAT] Chart canvas not found (expected id="answersChart").');
+      return null;
+    }
+    chart = new Chart(canvas, {
+      // Explicit type (your dataset also sets type:'bar', which is fine)
+      type: 'bar',
+      data: { labels: [], datasets: [] },
+      options: { responsive: true, maintainAspectRatio: true, animation: { duration: 250 } }
+    });
+  }
+  return chart;
+}
+
+/** Replace labels/dataset and (critically) unhide the chart container. */
+export function replaceChartData(labels, totals, datasetLabel = 'Total score') {
+  // 🔁 restore original behavior: unhide container on render
+  const container =
+    (els?.chartCanvas && els.chartCanvas.parentElement) ||
+    document.getElementById('answersChart')?.parentElement;
+  if (container) container.hidden = false;
+
+  const c = ensureChart();
+  if (!c) return;
+
+  const t = theme();
+
+  c.data.labels = Array.isArray(labels) ? labels : [];
+  c.data.datasets = [
+    {
+      type: 'bar',
+      data: Array.isArray(totals) ? totals : [],
+      label: datasetLabel,
+      backgroundColor: t.brandA,
+      borderColor: t.brand,
+      borderWidth: 1.25,
+      borderRadius: 6,
+    }
+  ];
+
+  // Preserve your per-render options (legend, scales, tooltip label callback)
+  c.options = {
+    responsive: true,
+    plugins: {
+      legend: { display: true },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => {
+            const v = ctx.raw;
+            const val = Number.isFinite(v) ? v : '—';
+            return `${ctx.dataset.label}: ${val}`;
+          }
+        }
+      }
+    },
+    scales: {
+      y: {
+        title: {
+          display: true,
+          text: 'Combined scores (fully covered respondent–question pairs)',
+        },
+        beginAtZero: true,
+        ticks: { precision: 0 },
+        grid: { color: theme().grid },
+        grace: '50%',
+      },
+      x: {
+        ticks: { autoSkip: true, maxRotation: 0, color: theme().text },
+        grid: { color: theme().grid }
+      }
+    }
+  };
+
+  c.update();
+}
+
+/** Clear all report areas and hide the chart container. */
+export function clearReportAreas() {
+  try { destroyChart(); } catch {}
+  const container =
+    (els?.chartCanvas && els.chartCanvas.parentElement) ||
+    document.getElementById('answersChart')?.parentElement;
+  if (container) container.hidden = true;
+
+  // NEW: also clear Strengths & Training Needs
+  try { clearTeamStrengths(); } catch {}
+
+  if (els?.chartStatus) els.chartStatus.textContent = '';
+  if (els?.pageHeader) els.pageHeader.hidden = true;
+  if (els?.multiList) els.multiList.innerHTML = '';
+  if (els?.mcSection) els.mcSection.hidden = true;
+
+  const scList = document.getElementById('score-change-list');
+  const scSection = document.getElementById('score-change-section');
+  if (scList) scList.innerHTML = '';
+  if (scSection) scSection.hidden = true;
+
+  const ltList = document.getElementById('longtext-answer-list');
+  const ltSection = document.getElementById('longtext-section');
+  if (ltList) ltList.innerHTML = '';
+  if (ltSection) ltSection.hidden = true;
+
+  const exHeader = document.getElementById('extremes-section-header');
+  const exSection = document.getElementById('extremes-section');
+  if (exHeader) exHeader.remove();
+  if (exSection) exSection.remove();
+}
+
+----- END FILE: assets/js/ui/chart.js -----
+
+----- BEGIN FILE: assets/js/ui/combobox.js -----
+(sha1: ce49c37bc707823ab420f514689126286e8e8096)
+
+import { els } from '../core/domRefs.js';
+import { GUIDS } from '../core/constants.js';
+import { fetchAllQuerySlim } from '../core/graph.js';
+import { getWorkspaceId } from '../core/config.js';
+import { throttle, setStatus, storage, upsertQueryParams } from '../utils.js';
+import { clearReportAreas } from '../ui/chart.js';
+import { loadRespondentAnswers } from '../features/respondentReport.js';
+let all=[], filtered=[], idx=-1, sel=null, opened=false;
+function openPanel(){ if(opened) return; opened=true; els.combo.classList.add('open'); els.panel.hidden=false; els.input.setAttribute('aria-expanded','true'); }
+function closePanel(){ if(!opened) return; opened=false; els.combo.classList.remove('open'); els.panel.hidden=true; els.input.setAttribute('aria-expanded','false'); els.input.removeAttribute('aria-activedescendant'); idx=-1; }
+function render(list){ els.list.innerHTML=''; if(!list.length){ const li=document.createElement('li'); li.className='empty'; li.textContent='No matches'; els.list.appendChild(li); return; } const frag=document.createDocumentFragment(); list.forEach((it,i)=>{ const li=document.createElement('li'); li.id=`resp-opt-${i}`; li.setAttribute('role','option'); li.dataset.value=it.value; li.textContent=it.text; li.addEventListener('mousedown',e=>{ e.preventDefault(); choose(i); }); frag.appendChild(li); }); els.list.appendChild(frag); }
+function highlight(i){ const opts=Array.from(els.list.querySelectorAll('[role="option"]')); opts.forEach((el,j)=>{ el.classList.toggle('active', j===i); el.setAttribute('aria-selected', j===i?'true':'false'); }); if(i>=0 && opts[i]){ const o=opts[i]; o.scrollIntoView({block:'nearest'}); els.input.setAttribute('aria-activedescendant', o.id); } else { els.input.removeAttribute('aria-activedescendant'); } idx=i; }
+function filter(term){ const t=String(term??'').toLowerCase(); filtered = t ? all.filter(r=> r.text.toLowerCase().includes(t)) : all.slice(); render(filtered); highlight(filtered.length?0:-1); }
+function clearKeepText(){ sel=null; }
+export function getSelectedRespondentId(){ return sel; }
+export function clearRespondentSelection(){ sel=null; els.input.value=''; els.input.removeAttribute('aria-activedescendant'); highlight(-1); if(opened) closePanel(); storage.del('r1.selectedRespondent'); upsertQueryParams({ respondentId:'' }); }
+function choose(i){ if(i<0 || i>=filtered.length) return; const {text,value}=filtered[i]; els.input.value=text; sel=value; storage.set('r1.selectedRespondent',{ id:sel, name:text }); upsertQueryParams({ respondentId:sel }); closePanel(); try{ clearReportAreas(); }catch{} setStatus('Loading respondent report…'); loadRespondentAnswers().catch(e=> setStatus(`Failed to load: ${e.message}`)); }
+export function selectRespondentById(id){ if(!id) return false; const i=all.findIndex(r=> String(r.value)===String(id)); if(i>=0){ const {text,value}=all[i]; els.input.value=text; sel=value; storage.set('r1.selectedRespondent',{ id:sel, name:text }); upsertQueryParams({ respondentId:sel }); try{ clearReportAreas(); }catch{} setStatus('Loading respondent report…'); loadRespondentAnswers().catch(e=> setStatus(`Failed to load: ${e.message}`)); return true; } return false; }
+export function initCombobox(){ els.input.addEventListener('focus', ()=>{ openPanel(); filter(els.input.value); }); els.input.addEventListener('click', ()=>{ openPanel(); filter(els.input.value); }); const thr=throttle(()=>{ filter(els.input.value); },150); els.input.addEventListener('input', ()=>{ clearKeepText(); if(!opened) openPanel(); thr(); }); els.input.addEventListener('keydown', e=>{ const has=filtered.length>0; switch(e.key){ case 'ArrowDown': e.preventDefault(); if(!opened) openPanel(); if(!has) return; highlight(Math.min(idx+1, filtered.length-1)); break; case 'ArrowUp': e.preventDefault(); if(!opened) openPanel(); if(!has) return; highlight(Math.max(idx-1, 0)); break; case 'Enter': if(opened && idx>=0){ e.preventDefault(); choose(idx); } break; case 'Escape': if(opened){ e.preventDefault(); closePanel(); } break; default: break; } }); document.addEventListener('mousedown', e=>{ if(!els.combo.contains(e.target)) closePanel(); }); all=[]; filtered=[]; els.list.innerHTML=''; els.input.value=''; sel=null; }
+export async function reloadRespondentsForVertical(guid){ all=[]; filtered=[]; sel=null; els.input.value=''; render(filtered); storage.del('r1.selectedRespondent'); upsertQueryParams({ respondentId:'' }); if(!guid) return; setStatus('Loading respondents for selected vertical…'); const ws=getWorkspaceId(); const base={ Request:{ ObjectType:{ GUID: GUIDS.ANSWER_OBJ }, fields:[{ GUID: GUIDS.RESPONDENT_REF }], condition:`'Question::Verticals' == CHOICE ${guid}`, sorts:[] } }; const rows=await fetchAllQuerySlim(ws, base, 1000); const by=new Map(); for(const o of rows){ const v=o?.Values?.[0]; if(!v) continue; const rid=v?.ArtifactID? String(v.ArtifactID) : null; const name=v?.Name ?? '(unnamed)'; const key=rid ?? `name:${name}`; if(!by.has(key)) by.set(key, { text:name, value: rid ?? name }); } all = Array.from(by.values()).sort((a,b)=> a.text.localeCompare(b.text, undefined, {sensitivity:'base'})); filtered=[]; els.list.innerHTML=''; setStatus(`Ready. (${all.length.toLocaleString()} eligible respondents)`); }
+
+----- END FILE: assets/js/ui/combobox.js -----
+
+----- BEGIN FILE: assets/js/ui/longText.js -----
+(sha1: 0f281dc0e49191062c368e144b4f34f355fc8bef)
+
+
+import { els } from '../core/domRefs.js';
+import { GUIDS } from '../core/constants.js';
+import { getWorkspaceId } from '../core/config.js';
+import { fetchAllQuerySlim } from '../core/graph.js';
+import { compareDatNames, escapeSingleQuotes, normalizeQuestion } from '../utils.js';
+
+/**
+ * Ensures the Long Text section exists in the DOM and wires toolbar actions.
+ */
+function ensureSection() {
+  if (document.getElementById('longtext-section')) return;
+
+  const section = document.createElement('section');
+  section.id = 'longtext-section';
+  section.setAttribute('aria-labelledby', 'longtext-label');
+  section.hidden = true;
+
+  const headerWrap = document.createElement('div');
+  headerWrap.style.display = 'flex';
+  headerWrap.style.alignItems = 'center';
+  headerWrap.style.justifyContent = 'space-between';
+  headerWrap.style.gap = '12px';
+
+  const h2 = document.createElement('h2');
+  h2.id = 'longtext-label';
+  h2.textContent = 'Text Answers';
+  headerWrap.appendChild(h2);
+
+  const toolbar = document.createElement('div');
+  toolbar.className = 'lt-toolbar';
+
+  const expandBtn = document.createElement('button');
+  expandBtn.type = 'button';
+  expandBtn.className = 'primary';
+  expandBtn.id = 'lt-expand-all';
+  expandBtn.textContent = 'Expand all';
+
+  const collapseBtn = document.createElement('button');
+  collapseBtn.type = 'button';
+  collapseBtn.id = 'lt-collapse-all';
+  collapseBtn.textContent = 'Collapse all';
+
+  toolbar.appendChild(expandBtn);
+  toolbar.appendChild(collapseBtn);
+  headerWrap.appendChild(toolbar);
+
+  section.appendChild(headerWrap);
+
+  const container = document.createElement('div');
+  container.id = 'longtext-answer-list';
+  container.className = 'longtext-answer-container';
+  section.appendChild(container);
+
+  const mc = els.mcSection;
+  const sc = document.getElementById('score-change-section');
+  const ex = document.getElementById('extremes-section');
+
+  if (mc && mc.parentNode) {
+    let ref = null;
+    if (ex && ex.parentNode === mc.parentNode) ref = ex.nextSibling;
+    else if (sc && sc.parentNode === mc.parentNode) ref = sc.nextSibling;
+    else ref = mc.nextSibling;
+    mc.parentNode.insertBefore(section, ref);
+  } else {
+    document.body.appendChild(section);
+  }
+
+  document.getElementById('lt-expand-all').addEventListener('click', () => {
+    document.querySelectorAll('#longtext-section details.lt-item')
+      .forEach(d => (d.open = true));
+  });
+  document.getElementById('lt-collapse-all').addEventListener('click', () => {
+    document.querySelectorAll('#longtext-section details.lt-item')
+      .forEach(d => (d.open = false));
+  });
+}
+
+function renderRows(rows) {
+  ensureSection();
+
+  const mount = document.getElementById('longtext-answer-list');
+  const section = document.getElementById('longtext-section');
+  mount.innerHTML = '';
+
+  let count = 0;
+  rows.forEach(obj => {
+    const v = obj?.Values ?? [];
+    const qText = normalizeQuestion(v?.[1] ?? '');
+    const aText = v?.[2]?.Name ?? v?.[2] ?? '';
+
+    if (!qText && !aText) return;
+
+    const details = document.createElement('details');
+    details.className = 'lt-item';
+
+    const summary = document.createElement('summary');
+    summary.className = 'lt-summary';
+    summary.textContent = qText || '(Untitled question)';
+    details.appendChild(summary);
+
+    const pre = document.createElement('pre');
+    pre.className = 'lt-answer';
+    pre.textContent = String(aText ?? '');
+    details.appendChild(pre);
+
+    mount.appendChild(details);
+    count++;
+  });
+
+  section.hidden = count === 0;
+}
+
+async function getMostRecentDatName() {
+  const wsId = getWorkspaceId();
+
+  const base = {
+    Request: {
+      ObjectType: { GUID: GUIDS.DAT_OBJ },
+      fields: [{ GUID: GUIDS.DAT_NAME }],
+      condition: '',
+      sorts: []
+    }
+  };
+
+  const rows = await fetchAllQuerySlim(wsId, base, 1000);
+  const names = rows
+    .map(o => o?.Values?.[0] ?? o?.Values?.[0]?.Name ?? '')
+    .filter(Boolean);
+
+  if (!names.length) return null;
+
+  names.sort(compareDatNames);
+  return names[names.length - 1];
+}
+
+export async function loadRespondentLongTextAnswers(respondentArtifactId) {
+  const latest = await getMostRecentDatName();
+  ensureSection();
+
+  const label = document.getElementById('longtext-label');
+  if (label) label.textContent = latest ? `Text Answers (${latest})` : 'Text Answers';
+
+  if (!latest) {
+    document.getElementById('longtext-section').hidden = true;
+    return;
+  }
+
+  const wsId = getWorkspaceId();
+
+  // FIXED CONDITION BUILDER
+  const parts = [
+    `'Question::Answer Type' == CHOICE ${GUIDS.TYPE_LONGTEXT}`,
+    `'Respondent' IN OBJECT [${respondentArtifactId}]`,
+    `'DAT' == '${escapeSingleQuotes(latest)}'`
+  ];
+  const condition = parts.join(' AND ');
+
+  const base = {
+    Request: {
+      ObjectType: { GUID: GUIDS.ANSWER_OBJ },
+      fields: [
+        { GUID: GUIDS.QUESTION_ID },
+        { GUID: GUIDS.QUESTION_TEXT },
+        { GUID: GUIDS.LONG_TEXT }
+      ],
+      condition,
+      sorts: []
+    }
+  };
+
+  const rows = await fetchAllQuerySlim(wsId, base, 1000);
+  renderRows(rows);
+}
+
+----- END FILE: assets/js/ui/longText.js -----
+
+----- BEGIN FILE: assets/js/ui/multiChoice.js -----
+(sha1: 93326a1adc209de0cf118639e18ca2267ed8c3e6)
+
+import { els } from "../core/domRefs.js";
+import { GUIDS } from "../core/constants.js";
+import { fetchAllQuerySlim } from "../core/graph.js";
+import { getWorkspaceId } from "../core/config.js";
+import { normalizeQuestion } from "../utils.js";
+function group(response) {
+  const g = new Map();
+  (response.Objects ?? response.Data?.Objects ?? []).forEach((o) => {
+    const v = o?.Values ?? [];
+    const q = normalizeQuestion(v[0] ?? "").trim();
+    const d = v[2]?.Name ?? "";
+    const c = Array.isArray(v[1]) ? v[1] : [];
+    if (!g.has(q)) g.set(q, []);
+    g.get(q).push({ datName: d, choices: c });
+  });
+  return g;
+}
+function render(response, mount) {
+  const g = group(response);
+  const frag = document.createDocumentFragment();
+  let rendered = 0;
+  for (const [q, entries] of g.entries()) {
+    const s = document.createElement("section");
+    s.className = "qa";
+    const h4 = document.createElement("h4");
+    h4.textContent = q || "(Untitled question)";
+    s.appendChild(h4);
+    const row = document.createElement("div");
+    row.className = "dat-row";
+    entries.forEach(({ datName, choices }) => {
+      const col = document.createElement("div");
+      col.className = "dat-col";
+      const dat = document.createElement("div");
+      dat.className = "dat";
+      dat.textContent = datName || "(not set)";
+      col.appendChild(dat);
+      if (choices?.length) {
+        const ul = document.createElement("ul");
+        for (const ch of choices) {
+          const li = document.createElement("li");
+          li.textContent = ch?.Name ?? "(unnamed)";
+          ul.appendChild(li);
+        }
+        col.appendChild(ul);
+        rendered++;
+      } else {
+        const e = document.createElement("div");
+        e.className = "empty";
+        e.textContent = "No answers provided.";
+        col.appendChild(e);
+      }
+      row.appendChild(col);
+    });
+    s.appendChild(row);
+    frag.appendChild(s);
+  }
+  mount.innerHTML = "";
+  mount.appendChild(frag);
+  if (els.mcSection) els.mcSection.hidden = g.size === 0 || rendered === 0;
+}
+export async function loadRespondentMultiChoiceAnswers(id) {
+  const ws = getWorkspaceId();
+  const base = {
+    Request: {
+      ObjectType: { GUID: GUIDS.ANSWER_OBJ },
+      fields: [
+        { GUID: GUIDS.QUESTION_TEXT },
+        { GUID: GUIDS.MULTI_CHOICE },
+        { GUID: GUIDS.DAT },
+      ],
+      condition: `'Respondent' IN OBJECT [${id}] AND 'Question::Answer Type' == CHOICE ${GUIDS.TYPE_MULTI}`,
+      sorts: [{ Direction: "Ascending", FieldIdentifier: { GUID: GUIDS.DAT } }],
+    },
+  };
+  const rows = await fetchAllQuerySlim(ws, base, 1000);
+  render({ Objects: rows }, els.multiList);
+}
+
+----- END FILE: assets/js/ui/multiChoice.js -----
+
+----- BEGIN FILE: assets/js/ui/scoreChanges.js -----
+(sha1: d493137da10ada63a8548f394e66c4c658c0c0e5)
+
+import { els } from "../core/domRefs.js";
+function ensure() {
+  if (document.getElementById("score-change-section")) return;
+  const s = document.createElement("section");
+  s.id = "score-change-section";
+  s.setAttribute("aria-labelledby", "score-change-label");
+  s.hidden = true;
+  const c = document.createElement("div");
+  c.id = "score-change-list";
+  s.appendChild(c);
+  const mc = els.mcSection;
+  if (mc && mc.parentNode) mc.parentNode.insertBefore(s, mc.nextSibling);
+  else document.body.appendChild(s);
+}
+export function renderScoreChanges(inc, dec, earliest, latest, topN = 5) {
+  ensure();
+  const s = document.getElementById("score-change-section");
+  const m = document.getElementById("score-change-list");
+  m.innerHTML = "";
+  const hasI = Array.isArray(inc) && inc.length > 0;
+  const hasD = Array.isArray(dec) && dec.length > 0;
+  if (!hasI && !hasD) {
+    s.hidden = true;
+    return;
+  }
+  function add(t, items) {
+    const h = document.createElement("h3");
+    h.textContent = `${t} (${earliest} → ${latest})`;
+    m.appendChild(h);
+    const card = document.createElement("div");
+    card.className = "qa";
+    const ul = document.createElement("ul");
+    items.forEach((it) => {
+      const li = document.createElement("li");
+      const row = document.createElement("div");
+      row.className = "sc-row";
+      const q = document.createElement("span");
+      q.className = "sc-question";
+      q.textContent = it.qText;
+      const b = document.createElement("span");
+      b.className = `sc-badge ${it.delta > 0 ? "sc-up" : "sc-down"}`;
+      const strong = document.createElement("strong");
+      strong.textContent = it.delta > 0 ? `+${it.delta}` : `${it.delta}`;
+      const sub = document.createElement("span");
+      sub.className = "sc-sub";
+      sub.textContent = ` (${it.from} → ${it.to})`;
+      b.appendChild(strong);
+      b.appendChild(sub);
+      row.appendChild(q);
+      row.appendChild(b);
+      li.appendChild(row);
+      ul.appendChild(li);
+    });
+    card.appendChild(ul);
+    m.appendChild(card);
+  }
+  if (hasI) add("Noteable increases", inc.slice(0, topN));
+  if (hasD) add("Noteable decreases", dec);
+  s.hidden = false;
+}
+
+----- END FILE: assets/js/ui/scoreChanges.js -----
+
+----- BEGIN FILE: assets/js/ui/teamStrengths.js -----
+(sha1: 26eb2fe6f830bece26c28f59b9aa89d87dd95d38)
+
+
+// assets/js/ui/teamStrengths.js
+// Renders a "Strengths & Training Needs" section for the currently selected team/vertical.
+
+import { normalizeQuestion, compareDatNames, mapAnswer } from '../utils.js';
+
+export function renderTeamStrengths(rows, { topN = 5, minResponses = 2 } = {}) {
+  const sectionId = 'team-strengths-section';
+  const containerId = 'team-strengths-list';
+  ensureSection(sectionId, containerId);
+
+  // 1) Latest DAT
+  const periods = [...new Set((rows ?? []).map(r => r?.Values?.[2]?.Name).filter(Boolean))];
+  if (periods.length === 0) {
+    renderEmpty(containerId, 'No DAT periods found.');
+    return;
+  }
+  periods.sort(compareDatNames);
+  const latest = periods[periods.length - 1];
+
+  // 2) Aggregate Single-Choice per question for latest period
+  const byQuestion = new Map(); // qId -> { text, sum, count }
+  for (const r of rows ?? []) {
+    const dat = r?.Values?.[2]?.Name;
+    if (dat !== latest) continue;
+
+    const singleChoiceName = r?.Values?.[1]?.Name;
+    if (!singleChoiceName) continue; // excludes Yes/No implicitly
+
+    const qId = r?.Values?.[0]?.Name ?? r?.Values?.[0];
+    if (!qId) continue;
+
+    // 🔧 Prefer [5] (your vertical rows), then [4], then ID/name fallbacks
+    const qTextRaw =
+      r?.Values?.[5]?.Name ?? r?.Values?.[5] ??
+      r?.Values?.[4]?.Name ?? r?.Values?.[4] ??
+      r?.Values?.[0]?.Name ?? r?.Values?.[0] ?? qId;
+
+    const qText = normalizeQuestion(qTextRaw);
+    const score = mapAnswer(singleChoiceName);
+    if (!Number.isFinite(score)) continue;
+
+    const acc = byQuestion.get(qId) ?? { text: qText, sum: 0, count: 0 };
+    acc.sum += score;
+    acc.count += 1;
+    byQuestion.set(qId, acc);
+  }
+
+  // 3) Build averages with min sample size
+  const list = [];
+  for (const [, v] of byQuestion) {
+    if ((v.count ?? 0) < minResponses) continue;
+    list.push({ text: v.text, avg: v.sum / v.count, count: v.count });
+  }
+  if (list.length === 0) {
+    renderEmpty(containerId, 'No eligible single‑choice data found for the latest DAT.');
+    return;
+  }
+
+  // 4) Lowest / Highest
+  const needs = [...list].sort((a, b) => a.avg - b.avg).slice(0, topN);
+  const strengths = [...list].sort((a, b) => b.avg - a.avg).slice(0, topN);
+
+  // 5) Render
+  const mount = document.getElementById(containerId);
+  mount.innerHTML = '';
+
+  const hdr = document.createElement('div');
+  hdr.className = 'stn-header';
+  hdr.innerHTML = `
+    <div class="stn-subtitle">Latest DAT: <strong>${latest}</strong></div>
+  `;
+  mount.appendChild(hdr);
+
+  const grid = document.createElement('div');
+  grid.className = 'stn-grid';
+  grid.appendChild(makeList('Deltas', needs));
+  grid.appendChild(makeList('Strengths', strengths));
+  mount.appendChild(grid);
+}
+
+/* ---------- DOM helpers ---------- */
+
+function ensureSection(sectionId, containerId) {
+  if (document.getElementById(sectionId)) return;
+
+  const section = document.createElement('section');
+  section.id = sectionId;
+  section.setAttribute('aria-labelledby', `${sectionId}-label`);
+  section.className = 'stn-section';
+
+  const h2 = document.createElement('h2');
+  h2.id = `${sectionId}-label`;
+  h2.textContent = 'Strengths & Training Needs';
+  h2.className = 'stn-visually-hidden';
+
+  const body = document.createElement('div');
+  body.id = containerId;
+
+  section.appendChild(h2);
+  section.appendChild(body);
+
+  const chartContainer = (document.getElementById('answersChart') || {}).parentElement;
+  if (chartContainer && chartContainer.parentElement) {
+    chartContainer.parentElement.appendChild(section);
+  } else {
+    document.body.appendChild(section);
+  }
+}
+
+function renderEmpty(containerId, msg) {
+  const mount = document.getElementById(containerId);
+  if (!mount) return;
+  mount.innerHTML = '';
+  const p = document.createElement('p');
+  p.className = 'stn-empty';
+  p.textContent = msg;
+  mount.appendChild(p);
+}
+
+function makeList(title, items) {
+  const block = document.createElement('div');
+  block.className = 'stn-block';
+
+  const h3 = document.createElement('h3');
+  h3.textContent = title;
+  block.appendChild(h3);
+
+  const ul = document.createElement('ul');
+  ul.className = 'stn-list';
+
+  items.forEach(({ text, avg, count }) => {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <span class="stn-question">${text}</span>
+      <span class="stn-metric" aria-label="Average score">${Number(avg).toFixed(2)}</span>
+      <span class="stn-count" aria-label="Responses">(${count})</span>`;
+    ul.appendChild(li);
+  });
+
+  block.appendChild(ul);
+  return block;
+}
+
+/* ---------- reset API ---------- */
+
+export function clearTeamStrengths() {
+  const section = document.getElementById('team-strengths-section');
+  if (!section) return;
+  section.remove();
+}
+
+----- END FILE: assets/js/ui/teamStrengths.js -----
+
+----- BEGIN FILE: assets/js/utils.js -----
+(sha1: 89a2d5c13a94a183e2dbfdb2d1cac972596d59c0)
+
+import { els } from "./core/domRefs.js";
+export function mapAnswer(raw) {
+  const r = String(raw ?? "")
+    .trim()
+    .toLowerCase();
+  if (r.startsWith("(") && r.length > 2) {
+    const n = Number(r.charAt(1));
+    if (!Number.isNaN(n)) return n;
+  }
+  if (r === "true") return 1;
+  if (r === "false") return 0;
+  const n = Number(r);
+  return Number.isNaN(n) ? NaN : n;
+}
+export function normalizeQuestion(html) {
+  const d = document.createElement("div");
+  d.innerHTML = html ?? "";
+  return d.textContent || d.innerText || "";
+}
+export function throttle(
+  fn,
+  wait = 150,
+  o = { leading: true, trailing: true },
+) {
+  let last = 0,
+    tid = null,
+    args,
+    ctx;
+  return function (...g) {
+    const now = Date.now();
+    if (!last && o.leading === false) last = now;
+    const rem = wait - (now - last);
+    args = g;
+    ctx = this;
+    if (rem <= 0 || rem > wait) {
+      if (tid) {
+        clearTimeout(tid);
+        tid = null;
+      }
+      last = now;
+      fn.apply(ctx, args);
+      args = ctx = null;
+    } else if (!tid && o.trailing !== false) {
+      tid = setTimeout(() => {
+        last = o.leading === false ? 0 : Date.now();
+        tid = null;
+        fn.apply(ctx, args);
+        args = ctx = null;
+      }, rem);
+    }
+  };
+}
+export function setStatus(text) {
+  els?.chartStatus && (els.chartStatus.textContent = text ?? "");
+}
+export function escapeSingleQuotes(str) {
+  return String(str ?? "").replace(/'/g, "\\'");
+}
+export function parseDatName(name) {
+  const s = String(name ?? "")
+    .trim()
+    .toUpperCase();
+  const y = s.match(/(\d{4})/);
+  if (!y) return null;
+  const q = s.match(/Q([1-4])/);
+  return { year: Number(y[1]), quarter: q ? Number(q[1]) : 0 };
+}
+export function compareDatNames(a, b) {
+  const pa = parseDatName(a),
+    pb = parseDatName(b);
+  if (pa && pb) {
+    if (pa.year !== pb.year) return pa.year - pb.year;
+    return pa.quarter - pb.quarter;
+  }
+  if (pa && !pb) return 1;
+  if (!pa && pb) return -1;
+  return String(a).localeCompare(String(b));
+}
+export function getQueryParam(name) {
+  const p = new URLSearchParams(window.location.search);
+  return p.get(name);
+}
+export function upsertQueryParams(obj) {
+  const url = new URL(window.location.href);
+  const p = url.searchParams;
+  Object.entries(obj || {}).forEach(([k, v]) => {
+    if (v === null || v === undefined || v === "") p.delete(k);
+    else p.set(k, String(v));
+  });
+  window.history.replaceState({}, "", url.toString());
+}
+export const storage = {
+  get(key) {
+    try {
+      return JSON.parse(localStorage.getItem(key));
+    } catch {
+      return null;
+    }
+  },
+  set(key, val) {
+    try {
+      localStorage.setItem(key, JSON.stringify(val));
+    } catch {}
+  },
+  del(key) {
+    try {
+      localStorage.removeItem(key);
+    } catch {}
+  },
+};
+
+----- END FILE: assets/js/utils.js -----
+
+----- BEGIN FILE: index.html -----
+(sha1: 483e860077fee07a9ad7a4fa8f226701b47b16a8)
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Answers Over Time</title>
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/bar-theme.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/longtext.css" />
+  <link rel="stylesheet" href="assets/css/score-changes.css" />
+  <style id="tab-underline-enforcer">
+    #team-button-bar .team-tab.active,
+    #team-button-bar .team-tab[aria-selected="true"],
+    #team-button-bar .team-tab.active:hover,
+    #team-button-bar .team-tab[aria-selected="true"]:hover,
+    #team-button-bar .team-tab:focus,
+    #team-button-bar .team-tab.active:focus,
+    #team-button-bar .team-tab[aria-selected="true"]:focus,
+    #team-button-bar .team-tab:focus-visible,
+    #team-button-bar .team-tab.active:focus-visible,
+    #team-button-bar .team-tab[aria-selected="true"]:focus-visible {
+      background: linear-gradient(var(--proc-underline), var(--proc-underline)) left 100% / 100% 2px no-repeat !important;
+      background-color: transparent !important;
+      color: var(--text) !important;
+      box-shadow: none !important;
+      outline: none !important;
+      filter: none !important;
+    }
+    #team-button-bar .team-tab,
+    #team-button-bar .team-tab * {
+      background: transparent !important;
+      background-color: transparent !important;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" src="assets/js/index.js"></script>
+</head>
+<body>
+  <main>
+    <section aria-labelledby="teams-label">
+      <h2 id="teams-label" class="sr-only">Filter by vertical</h2>
+      <div id="team-button-bar" class="team-tabs" role="tablist" aria-label="Verticals"></div>
+    </section>
+    <section class="controls" aria-labelledby="controls-label">
+      <h2 id="controls-label" class="sr-only">Controls</h2>
+      <div id="respondentDropdown" class="control-group">
+        <div id="respondentCombo" class="combo" aria-label="Respondent filter">
+          <label for="respondentFilter" class="sr-only">Select respondent</label>
+          <input id="respondentFilter" type="search" placeholder="Select a respondent from the list…" autocomplete="off"
+                 aria-label="Select respondent" role="combobox" aria-autocomplete="list" aria-expanded="false"
+                 aria-haspopup="listbox" aria-controls="respondentList" />
+          <div id="respondentPanel" class="combo-panel" hidden>
+            <ul id="respondentList" role="listbox" tabindex="-1" aria-label="Respondents"></ul>
+          </div>
+        </div>
+        <button id="loadVerticalBtn" type="button" class="btn btn--secondary" aria-label="Load Vertical Report">Load Vertical Report</button>
+      </div>
+    </section>
+    <section aria-labelledby="chart-label">
+      <h2 id="chart-label" class="sr-only">Combined answer score over DAT surveys</h2>
+      <div class="chart-container" hidden>
+        <canvas id="answersChart" aria-label="Answers chart" role="img"></canvas>
+      </div>
+      <div id="chartStatus" class="status" aria-live="polite">Ready.</div>
+    </section>
+    <section id="mc-section" hidden>
+      <div id="multichoice-answer-list" class="multichoice-answer-container"></div>
+    </section>
+  </main>
+</body>
+</html>
+
+----- END FILE: index.html -----
+
+## Included files
+assets/css/bar-theme.css
+assets/css/base.css
+assets/css/components.css
+assets/css/longtext.css
+assets/css/score-changes.css
+assets/js/app.js
+assets/js/core/config.js
+assets/js/core/constants.js
+assets/js/core/domRefs.js
+assets/js/core/graph.js
+assets/js/core/http.js
+assets/js/features/respondentReport.js
+assets/js/features/teamMultiChoiceAgg.js
+assets/js/features/verticalReport.js
+assets/js/index.js
+assets/js/theme.js
+assets/js/ui/chart.js
+assets/js/ui/combobox.js
+assets/js/ui/longText.js
+assets/js/ui/multiChoice.js
+assets/js/ui/scoreChanges.js
+assets/js/ui/teamStrengths.js
+assets/js/utils.js
+index.html
