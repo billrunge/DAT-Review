@@ -1,6 +1,6 @@
 # Project Snapshot
-Generated: 2026-02-12T20:19:37Z
-Commit: b6c2361
+Generated: 2026-02-12T22:48:25Z
+Commit: 4c1225e
 
 ----- BEGIN FILE: assets/css/bar-theme.css -----
 (sha1: afc71031800933e51fcef77aeb0059fc4477257c)
@@ -13,11 +13,9 @@ body{ font-family:var(--font-sans); color:var(--text); background:var(--canvas);
 ----- END FILE: assets/css/bar-theme.css -----
 
 ----- BEGIN FILE: assets/css/base.css -----
-(sha1: acb73b9b9733ba120bac96196cc53c31d0936324)
-
+(sha1: 6f7c74307183753d028623134eee42a4065ef697)
 
 /* assets/css/base.css */
-
 /* ===== CSS Tokens (Light theme) ===== */
 :root {
   --border: #d1d5db;
@@ -25,22 +23,17 @@ body{ font-family:var(--font-sans); color:var(--text); background:var(--canvas);
   --bg-muted: #f9fafb;
   --bg-hover: #f3f4f6;
   --text: #111827;
-
   --primary: #2563eb;
   --primary-alpha: #2563eb22;
-
   --radius: 8px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
   --space-5: 24px;
-
   --shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
-
   /* Typography for charts and UI */
   --font-sans: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-
   /* ===== Used by Chart.js tooltip ===== */
   --tooltip-bg: #ffffff;
 }
@@ -52,9 +45,7 @@ body{ font-family:var(--font-sans); color:var(--text); background:var(--canvas);
   --bg-muted: #0f172a;
   --bg-hover: #111827;
   --border: #334155;
-
   --shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-
   --tooltip-bg: #111827;
 }
 
@@ -108,7 +99,8 @@ label {
 
 /* Inputs & buttons */
 input,
-button {
+button,
+select {
   appearance: none;
   border: 1px solid var(--border);
   background: var(--bg-muted);
@@ -125,13 +117,20 @@ input[type="search"] {
   cursor: text;
 }
 
-button:hover:not(.team-tab) {
+select {
+  background: var(--bg);
+}
+
+/* Hover */
+button:hover:not(.team-tab),
+select:hover {
   background: var(--bg-hover);
   border-color: #9ca3af;
 }
 
 button:focus-visible,
-input:focus-visible {
+input:focus-visible,
+select:focus-visible {
   outline: 3px solid color-mix(in oklab, var(--primary) 40%, transparent);
   outline-offset: 2px;
 }
@@ -145,15 +144,18 @@ input:focus-visible {
 .stn-section {
   margin-top: var(--space-5);
 }
+
 .stn-header {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   margin-bottom: var(--space-3);
 }
+
 .stn-title {
   font-weight: 700;
 }
+
 .stn-subtitle {
   opacity: 0.75;
 }
@@ -163,6 +165,7 @@ input:focus-visible {
   gap: var(--space-4);
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
+
 .stn-block {
   border: 1px solid var(--border);
   background: var(--bg-muted);
@@ -170,11 +173,13 @@ input:focus-visible {
   padding: var(--space-4);
   box-shadow: var(--shadow);
 }
+
 .stn-list {
   list-style: none;
   margin: 0;
   padding: 0;
 }
+
 .stn-list li {
   display: flex;
   align-items: baseline;
@@ -182,17 +187,21 @@ input:focus-visible {
   padding: 6px 0;
   border-bottom: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
 }
+
 .stn-list li:last-child {
   border-bottom: 0;
 }
+
 .stn-question {
   inline-size: 70%;
 }
+
 .stn-metric {
   font-variant-numeric: tabular-nums;
   font-weight: 600;
   margin-left: 8px;
 }
+
 .stn-count {
   opacity: 0.65;
   margin-left: 8px;
@@ -204,40 +213,33 @@ input:focus-visible {
 }
 
 /* ================================
-   FLOATING PRINT / PDF BUTTON
-   ================================ */
+  FLOATING PRINT / PDF BUTTON
+================================ */
 .floating-print-btn {
   position: fixed;
   top: 16px;
   right: 16px;
   z-index: 9999;
-
   background: var(--brand);
   border: none;
   color: #fff;
-
-  width: 48px;        /* Ensures a perfect circle */
+  width: 48px;
   height: 48px;
-  padding: 0;         /* Remove padding so SVG centers */
-
+  padding: 0;
   border-radius: 50%;
   cursor: pointer;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   box-shadow: 0 4px 12px rgba(0,0,0,0.18);
   transition: background 0.2s ease, transform 0.2s ease;
-
-  overflow: visible;  /* Avoid clipping in some browsers */
+  overflow: visible;
 }
 
-/* Prevent clipping / baseline issues */
 .floating-print-btn svg {
   width: 22px;
   height: 22px;
-  display: block;   /* Removes baseline shift */
+  display: block;
 }
 
 .floating-print-btn:hover {
@@ -245,14 +247,13 @@ input:focus-visible {
   transform: scale(1.05);
 }
 
-/* Critical: enforce hidden state */
 .floating-print-btn[hidden] {
   display: none !important;
 }
 
 /* ===========================
-   PRINT / EXPORT TO PDF MODE
-   =========================== */
+  PRINT / EXPORT TO PDF MODE
+=========================== */
 @media print {
   body {
     padding: 0 !important;
@@ -323,7 +324,6 @@ input:focus-visible {
     display: none;
   }
 }
-
 ----- END FILE: assets/css/base.css -----
 
 ----- BEGIN FILE: assets/css/components.css -----
@@ -665,8 +665,7 @@ export async function fetchJson(url, options, timeoutMs = 30000) {
 ----- END FILE: assets/js/core/http.js -----
 
 ----- BEGIN FILE: assets/js/features/respondentReport.js -----
-(sha1: 755263e2761410ace93ea47686aa6adb8845c1e1)
-
+(sha1: 3039ffa5ad354f7bea36cd551cfea3dbc61f7c28)
 
 // assets/js/features/respondentReport.js
 import { els } from "../core/domRefs.js";
@@ -685,11 +684,16 @@ import { loadRespondentLongTextAnswers } from "../ui/longText.js";
 import { renderScoreChanges } from "../ui/scoreChanges.js";
 import { getSelectedRespondentId } from "../ui/combobox.js";
 import { setPrintHeader } from "../app.js";
+import { init, activate, setReloadHandler, setOptions, getRange, show } from "../ui/datRange.js";
 
 export async function loadRespondentAnswers() {
+  init();
+
   if (els.mcSection) els.mcSection.hidden = true;
+
   const sc = document.getElementById("score-change-section");
   if (sc) sc.hidden = true;
+
   const lt = document.getElementById("longtext-section");
   if (lt) lt.hidden = true;
 
@@ -700,27 +704,33 @@ export async function loadRespondentAnswers() {
     return;
   }
 
-  // Set the dynamic print header with respondent + active vertical (if present)
+  // Make DAT controls visible once a respondent is selected/loaded
+  activate('respondent', { showControls: true });
+  show();
+
+  // Auto reload respondent report on DAT range change
+  setReloadHandler(async () => {
+    await loadRespondentAnswers();
+  });
+
   const respondentName = els.input?.value || "Selected respondent";
   const activeTab = els.teamBar?.querySelector("button.team-tab.active");
   const verticalName = activeTab?.dataset?.label || "";
-  const header = verticalName
-    ? `${respondentName} — ${verticalName}`
-    : `${respondentName}`;
+  const header = verticalName ? `${respondentName} — ${verticalName}` : `${respondentName}`;
   setPrintHeader(header);
 
   setStatus("Loading respondent chart…");
-  const ws = getWorkspaceId();
 
+  const ws = getWorkspaceId();
   const base = {
     Request: {
       ObjectType: { GUID: GUIDS.ANSWER_OBJ },
       fields: [
-        { GUID: GUIDS.QUESTION_ID }, // [0]
-        { GUID: GUIDS.SINGLE_CHOICE }, // [1]
-        { GUID: GUIDS.DAT }, // [2]
-        { GUID: GUIDS.YES_NO }, // [3]
-        { GUID: GUIDS.QUESTION_TEXT }, // [4]
+        { GUID: GUIDS.QUESTION_ID },     // [0]
+        { GUID: GUIDS.SINGLE_CHOICE },   // [1]
+        { GUID: GUIDS.DAT },             // [2]
+        { GUID: GUIDS.YES_NO },          // [3]
+        { GUID: GUIDS.QUESTION_TEXT },   // [4]
       ],
       condition:
         `('Respondent' IN OBJECT [${id}] AND (` +
@@ -732,10 +742,28 @@ export async function loadRespondentAnswers() {
 
   const rows = await fetchAllQuerySlim(ws, base, 1000);
 
-  const periods = Array.from(
-    new Set(rows.map((r) => r.Values?.[2]?.Name).filter(Boolean)),
-  );
+  // Determine relevant DATs for this respondent
+  const presentSet = new Set(rows.map(r => r.Values?.[2]?.Name).filter(Boolean));
+  const periodsAll = Array.from(presentSet);
+  periodsAll.sort(compareDatNames);
+
+  // Populate dropdowns with relevant respondent DATs (hide if none)
+  setOptions(periodsAll, { hideIfEmpty: true });
+
+  // Apply DAT range
+  const { from, to } = getRange();
+  let periods = periodsAll.slice();
+
+  if (from && to) {
+    periods = periods.filter(p => compareDatNames(p, from) >= 0 && compareDatNames(p, to) <= 0);
+  }
   periods.sort(compareDatNames);
+
+  if (periods.length === 0) {
+    setStatus("No DATs available for this respondent in the selected range.");
+    return;
+  }
+
   const earliest = periods[0];
   const latest = periods[periods.length - 1];
 
@@ -749,6 +777,8 @@ export async function loadRespondentAnswers() {
     const raw = r?.Values?.[1]?.Name ?? r?.Values?.[3]?.Name ?? 0;
 
     if (!q || !p) return;
+    if (!periods.includes(p)) return;
+
     series[q] ??= {};
     series[q][p] = mapAnswer(raw);
     if (qt && !qTextMap[q]) qTextMap[q] = qt;
@@ -769,15 +799,16 @@ export async function loadRespondentAnswers() {
 
   const changes = [];
   Object.keys(series).forEach((q) => {
-    const from = series[q][earliest];
-    const to = series[q][latest];
-    if (!Number.isFinite(from) || !Number.isFinite(to)) return;
+    const fromVal = series[q][earliest];
+    const toVal = series[q][latest];
+    if (!Number.isFinite(fromVal) || !Number.isFinite(toVal)) return;
+
     changes.push({
       qId: q,
       qText: qTextMap[q] ?? q,
-      from,
-      to,
-      delta: to - from,
+      from: fromVal,
+      to: toVal,
+      delta: toVal - fromVal,
     });
   });
 
@@ -796,7 +827,6 @@ export async function loadRespondentAnswers() {
 
   setStatus(`Chart updated. (${rows.length.toLocaleString()} records)`);
 
-  // SHOW floating print button
   const fp = document.getElementById("floatingPrintBtn");
   if (fp) fp.hidden = false;
 }
@@ -823,6 +853,7 @@ function renderExtremes(rows, series, periods, map) {
     const vals = periods
       .map((p) => series[q]?.[p])
       .filter((v) => Number.isFinite(v));
+
     if (!vals.length) return;
     const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
     out.push({ qId: q, qText: map[q] ?? q, avg });
@@ -834,8 +865,7 @@ function renderExtremes(rows, series, periods, map) {
   const lowest = out.slice(0, 5);
   const highest = out.slice(-5).reverse();
 
-  const anchor =
-    document.getElementById("score-change-section") || els.mcSection;
+  const anchor = document.getElementById("score-change-section") || els.mcSection;
   const parent = anchor?.parentNode || document.body;
 
   document.getElementById("extremes-section")?.remove();
@@ -876,12 +906,13 @@ function renderExtremes(rows, series, periods, map) {
 
       b.appendChild(strong);
       b.appendChild(sub);
+
       row.appendChild(q);
       row.appendChild(b);
-
       li.appendChild(row);
       ul.appendChild(li);
     });
+
     card.appendChild(ul);
   };
 
@@ -896,7 +927,6 @@ function renderExtremes(rows, series, periods, map) {
     parent.appendChild(card);
   }
 }
-
 ----- END FILE: assets/js/features/respondentReport.js -----
 
 ----- BEGIN FILE: assets/js/features/teamMultiChoiceAgg.js -----
@@ -1036,7 +1066,7 @@ export async function loadTeamMultiChoiceAnswers(verticalChoiceGuid) {
 ----- END FILE: assets/js/features/teamMultiChoiceAgg.js -----
 
 ----- BEGIN FILE: assets/js/features/verticalReport.js -----
-(sha1: 44b9d6ea16f4025900bbb1629e66a55b163608c1)
+(sha1: 2eaf836154e2eb2e9507fbe39ba1bff13d32d624)
 
 // assets/js/features/verticalReport.js
 import { els } from '../core/domRefs.js';
@@ -1050,14 +1080,14 @@ import { renderScoreChanges } from '../ui/scoreChanges.js';
 import { reloadRespondentsForVertical } from '../ui/combobox.js';
 import { renderTeamStrengths } from '../ui/teamStrengths.js';
 import { setPrintHeader } from '../app.js';
+import { init, activate, setReloadHandler, setOptions, getRange, show } from '../ui/datRange.js';
 
-/**
- * Tiny improvement:
- * Get the master DAT list from the DAT object type, sort it deterministically,
- * then filter to only DATs present in the answer rows we loaded for the report.
- * This avoids Set insertion-order surprises from QuerySlim row ordering.
- */
+let allDatNamesCache = null;
+let lastLoadedVerticalChoice = null;
+
 async function getAllDatNames() {
+  if (Array.isArray(allDatNamesCache) && allDatNamesCache.length) return allDatNamesCache;
+
   const wsId = getWorkspaceId();
   const base = {
     Request: {
@@ -1067,17 +1097,20 @@ async function getAllDatNames() {
       sorts: [],
     },
   };
+
   const rows = await fetchAllQuerySlim(wsId, base, 1000);
   const names = rows
-    .map((o) => o?.Values?.[0]?.Name ?? o?.Values?.[0] ?? '')
+    .map(o => o?.Values?.[0]?.Name ?? o?.Values?.[0] ?? '')
     .filter(Boolean);
 
-  // Deterministic chronological ordering (Qx YYYY)
   names.sort(compareDatNames);
+  allDatNamesCache = names;
   return names;
 }
 
 export async function loadVerticals() {
+  init(); // initialize DAT range control listeners
+
   const wsId = getWorkspaceId();
   const body = { FieldIdentifier: { Guids: [GUIDS.VERTICALS_FIELD] } };
   const data = await fetchJson(ROUTES.choiceParents(wsId), {
@@ -1085,10 +1118,7 @@ export async function loadVerticals() {
     body: JSON.stringify(body),
   });
 
-  data.sort((a, b) =>
-    (a?.Name ?? '').localeCompare(b?.Name ?? '', undefined, { sensitivity: 'base' }),
-  );
-
+  data.sort((a, b) => (a?.Name ?? '').localeCompare(b?.Name ?? '', undefined, { sensitivity: 'base' }));
   renderTeamButtons(data);
 }
 
@@ -1115,6 +1145,15 @@ function renderTeamButtons(data) {
 
     btn.addEventListener('click', async () => {
       setActiveTab(container, btn);
+
+      // Selecting a vertical should reveal DAT controls (still empty until report loads)
+      activate('vertical', { showControls: true });
+      show();
+
+      // No auto-reload until a report is actually loaded
+      setReloadHandler(null);
+      lastLoadedVerticalChoice = null;
+
       clearReportAreas();
 
       if (btn.dataset.choiceGuid) {
@@ -1122,11 +1161,9 @@ function renderTeamButtons(data) {
       }
 
       setStatus('Choose a respondent or click "Load Vertical Report".');
-      // Clear header until a report is actually loaded
       setPrintHeader('');
 
-      // Hide floating button proactively on tab switch
-      const fp = document.getElementById('floatingPrintBtn');
+      const fp = document.getElementById("floatingPrintBtn");
       if (fp) fp.hidden = true;
     });
 
@@ -1137,12 +1174,19 @@ function renderTeamButtons(data) {
   if (first) {
     setActiveTab(container, first);
     requestAnimationFrame(async () => {
+      // Selecting a vertical should reveal DAT controls
+      activate('vertical', { showControls: true });
+      show();
+
+      setReloadHandler(null);
+      lastLoadedVerticalChoice = null;
+
       if (first.dataset.choiceGuid) {
         await reloadRespondentsForVertical(first.dataset.choiceGuid);
       }
       setStatus('Choose a respondent or click "Load Vertical Report".');
       setPrintHeader('');
-      const fp = document.getElementById('floatingPrintBtn');
+      const fp = document.getElementById("floatingPrintBtn");
       if (fp) fp.hidden = true;
     });
   }
@@ -1168,11 +1212,18 @@ function setActiveTab(container, newActive) {
 }
 
 export async function loadTeamAnswers(verticalChoice) {
+  lastLoadedVerticalChoice = verticalChoice;
+
+  // Auto-reload when DAT range changes, once a vertical report has been loaded
+  setReloadHandler(async () => {
+    if (!lastLoadedVerticalChoice) return;
+    await loadTeamAnswers(lastLoadedVerticalChoice);
+  });
+
   if (els.mcSection) els.mcSection.hidden = true;
 
   setStatus(`Loading team answers for ${verticalChoice?.name ?? 'selected vertical'}…`);
 
-  // Set the dynamic print header for vertical reports
   if (verticalChoice?.name) setPrintHeader(`${verticalChoice.name}`);
   else setPrintHeader('Vertical Report');
 
@@ -1198,16 +1249,31 @@ export async function loadTeamAnswers(verticalChoice) {
   };
 
   const rows = await fetchAllQuerySlim(wsId, base, 1000);
-
   if (els.multiList) els.multiList.innerHTML = '';
 
-  // ---- Tiny improvement: determine DAT periods from DAT objects, then filter to those present in rows
+  // Relevant DATs only (avoid showing DAT ranges with no values)
   const allDats = await getAllDatNames();
-  const present = new Set(rows.map((r) => r.Values?.[2]?.Name).filter(Boolean));
-  const periods = allDats.filter((d) => present.has(d));
+  const present = new Set(rows.map(r => r.Values?.[2]?.Name).filter(Boolean));
+  const relevantDats = allDats.filter(d => present.has(d));
 
-  // Defensive: ensure sorted even if upstream changes
+  // Populate dropdowns with relevant DATs (or hide controls if none)
+  setOptions(relevantDats, { hideIfEmpty: true });
+
+  // Apply selected range
+  const { from, to } = getRange();
+  let periods = relevantDats.slice();
+
+  if (from && to) {
+    periods = periods.filter(d => compareDatNames(d, from) >= 0 && compareDatNames(d, to) <= 0);
+  }
+
   periods.sort(compareDatNames);
+
+  if (periods.length === 0) {
+    clearReportAreas();
+    setStatus('No DATs available for this vertical in the selected range.');
+    return;
+  }
 
   const earliest = periods[0];
   const latest = periods[periods.length - 1];
@@ -1225,6 +1291,7 @@ export async function loadTeamAnswers(verticalChoice) {
     const valRaw = single ?? yesno ?? 0;
 
     if (!qId || !period || !respondent) return;
+    if (!periods.includes(period)) return;
 
     series[qId] ??= {};
     series[qId][respondent] ??= {};
@@ -1254,10 +1321,8 @@ export async function loadTeamAnswers(verticalChoice) {
 
   replaceChartData(periods, totals);
 
-  // Strengths & Training Needs section (latest DAT)
   renderTeamStrengths(rows, { topN: 5, minResponses: 2 });
 
-  // Load Multi-choice aggregation for team/vertical
   import('./teamMultiChoiceAgg.js').then((m) => m.loadTeamMultiChoiceAnswers(verticalChoice.guid));
 
   const changes = [];
@@ -1281,16 +1346,16 @@ export async function loadTeamAnswers(verticalChoice) {
       return count > 0 ? sum / count : NaN;
     };
 
-    const from = avg(earliest);
-    const to = avg(latest);
-    if (!Number.isFinite(from) || !Number.isFinite(to)) return;
+    const fromAvg = avg(earliest);
+    const toAvg = avg(latest);
+    if (!Number.isFinite(fromAvg) || !Number.isFinite(toAvg)) return;
 
     changes.push({
       qId,
       qText: qTextMap[qId] ?? qId,
-      from: Math.round(from * 100) / 100,
-      to: Math.round(to * 100) / 100,
-      delta: Math.round((to - from) * 100) / 100,
+      from: Math.round(fromAvg * 100) / 100,
+      to: Math.round(toAvg * 100) / 100,
+      delta: Math.round((toAvg - fromAvg) * 100) / 100,
     });
   });
 
@@ -1304,8 +1369,7 @@ export async function loadTeamAnswers(verticalChoice) {
 
   setStatus(`Team chart updated. (${rows.length.toLocaleString()} records)`);
 
-  // SHOW floating print button
-  const fp = document.getElementById('floatingPrintBtn');
+  const fp = document.getElementById("floatingPrintBtn");
   if (fp) fp.hidden = false;
 }
 
@@ -1322,12 +1386,10 @@ start();
 ----- END FILE: assets/js/index.js -----
 
 ----- BEGIN FILE: assets/js/ui/chart.js -----
-(sha1: c75fb194638e96dd93caa5ae12fd5a67ec4b296a)
-
+(sha1: 65b75a34d6a68d16b86ebdcc0ac8cce2b6b96bda)
 
 // assets/js/ui/chart.js
 // Centralized Chart.js configuration + helpers used by the DAT Review page.
-
 import { els } from '../core/domRefs.js';
 import { clearTeamStrengths } from './teamStrengths.js';
 
@@ -1340,11 +1402,11 @@ function cssVar(name) {
 }
 
 function theme() {
-  const text   = cssVar('--text') || '#0f172a';
-  const grid   = cssVar('--border') || '#e5e8f0';
-  const brand  = cssVar('--brand') || '#2b5eff';
+  const text = cssVar('--text') || '#0f172a';
+  const grid = cssVar('--border') || '#e5e8f0';
+  const brand = cssVar('--brand') || '#2b5eff';
   const brandA = cssVar('--brand-alpha-20') || 'rgba(43,94,255,.20)';
-  const font   = cssVar('--font-sans') || 'system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif';
+  const font = cssVar('--font-sans') || 'system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif';
   const tooltipBg = cssVar('--tooltip-bg') || cssVar('--bg') || '#ffffff';
   return { text, grid, brand, brandA, font, tooltipBg };
 }
@@ -1363,22 +1425,23 @@ function applyChartDefaults() {
   Chart.defaults.plugins.tooltip = Chart.defaults.plugins.tooltip || {};
   Chart.defaults.plugins.tooltip.enabled = true;
   Chart.defaults.plugins.tooltip.titleColor = t.text;
-  Chart.defaults.plugins.tooltip.bodyColor  = t.text;
+  Chart.defaults.plugins.tooltip.bodyColor = t.text;
   Chart.defaults.plugins.tooltip.backgroundColor = t.tooltipBg;
-  Chart.defaults.plugins.tooltip.borderColor     = t.grid;
-  Chart.defaults.plugins.tooltip.borderWidth     = 1;
-  Chart.defaults.plugins.tooltip.padding         = 10;
-  Chart.defaults.plugins.tooltip.displayColors   = true;
-  Chart.defaults.plugins.tooltip.boxWidth        = 8;
-  Chart.defaults.plugins.tooltip.boxHeight       = 8;
-  Chart.defaults.plugins.tooltip.boxPadding      = 4;
+  Chart.defaults.plugins.tooltip.borderColor = t.grid;
+  Chart.defaults.plugins.tooltip.borderWidth = 1;
+  Chart.defaults.plugins.tooltip.padding = 10;
+  Chart.defaults.plugins.tooltip.displayColors = true;
+  Chart.defaults.plugins.tooltip.boxWidth = 8;
+  Chart.defaults.plugins.tooltip.boxHeight = 8;
+  Chart.defaults.plugins.tooltip.boxPadding = 4;
 
   Chart.defaults.scales = Chart.defaults.scales || {};
   Chart.defaults.scales.x = Chart.defaults.scales.x || {};
   Chart.defaults.scales.y = Chart.defaults.scales.y || {};
-  Chart.defaults.scales.x.grid  = { ...(Chart.defaults.scales.x.grid  || {}), color: t.grid };
+
+  Chart.defaults.scales.x.grid = { ...(Chart.defaults.scales.x.grid || {}), color: t.grid };
   Chart.defaults.scales.x.ticks = { ...(Chart.defaults.scales.x.ticks || {}), color: t.text };
-  Chart.defaults.scales.y.grid  = { ...(Chart.defaults.scales.y.grid  || {}), color: t.grid };
+  Chart.defaults.scales.y.grid = { ...(Chart.defaults.scales.y.grid || {}), color: t.grid };
   Chart.defaults.scales.y.ticks = { ...(Chart.defaults.scales.y.ticks || {}), color: t.text };
 }
 
@@ -1387,6 +1450,7 @@ const themeObserver = new MutationObserver(() => {
   const c = getChart();
   if (c) c.update();
 });
+
 try {
   themeObserver.observe(document.documentElement, {
     attributes: true,
@@ -1394,7 +1458,9 @@ try {
   });
 } catch {}
 
-function getChart() { return chart || null; }
+function getChart() {
+  return chart || null;
+}
 
 export function destroyChart() {
   const c = getChart();
@@ -1422,7 +1488,7 @@ export function ensureChart() {
     chart = new Chart(canvas, {
       type: 'bar',
       data: { labels: [], datasets: [] },
-      options: { responsive: true, maintainAspectRatio: true, animation: { duration: 250 } }
+      options: { responsive: true, maintainAspectRatio: true, animation: { duration: 250 } },
     });
   }
   return chart;
@@ -1432,13 +1498,13 @@ export function replaceChartData(labels, totals, datasetLabel = 'Total score') {
   const container =
     (els?.chartCanvas && els.chartCanvas.parentElement) ||
     document.getElementById('answersChart')?.parentElement;
+
   if (container) container.hidden = false;
 
   const c = ensureChart();
   if (!c) return;
 
   const t = theme();
-
   c.data.labels = Array.isArray(labels) ? labels : [];
   c.data.datasets = [
     {
@@ -1449,7 +1515,7 @@ export function replaceChartData(labels, totals, datasetLabel = 'Total score') {
       borderColor: t.brand,
       borderWidth: 1.25,
       borderRadius: 6,
-    }
+    },
   ];
 
   c.options = {
@@ -1462,9 +1528,9 @@ export function replaceChartData(labels, totals, datasetLabel = 'Total score') {
             const v = ctx.raw;
             const val = Number.isFinite(v) ? v : '—';
             return `${ctx.dataset.label}: ${val}`;
-          }
-        }
-      }
+          },
+        },
+      },
     },
     scales: {
       y: {
@@ -1479,9 +1545,9 @@ export function replaceChartData(labels, totals, datasetLabel = 'Total score') {
       },
       x: {
         ticks: { autoSkip: true, maxRotation: 0, color: theme().text },
-        grid: { color: theme().grid }
-      }
-    }
+        grid: { color: theme().grid },
+      },
+    },
   };
 
   c.update();
@@ -1489,14 +1555,20 @@ export function replaceChartData(labels, totals, datasetLabel = 'Total score') {
 
 export function clearReportAreas() {
   try { destroyChart(); } catch {}
+
   const container =
     (els?.chartCanvas && els.chartCanvas.parentElement) ||
     document.getElementById('answersChart')?.parentElement;
+
   if (container) container.hidden = true;
 
   // Hide floating print button
-  const fp = document.getElementById("floatingPrintBtn");
+  const fp = document.getElementById('floatingPrintBtn');
   if (fp) fp.hidden = true;
+
+  // Hide DAT range controls when clearing reports
+  const datCtl = document.getElementById('dat-range-controls');
+  if (datCtl) datCtl.hidden = true;
 
   // Also clear Strengths & Training Needs
   try { clearTeamStrengths(); } catch {}
@@ -1524,7 +1596,7 @@ export function clearReportAreas() {
 ----- END FILE: assets/js/ui/chart.js -----
 
 ----- BEGIN FILE: assets/js/ui/combobox.js -----
-(sha1: ce49c37bc707823ab420f514689126286e8e8096)
+(sha1: 55a4be9680607fe43d6c8957d4c99effd54515ce)
 
 import { els } from '../core/domRefs.js';
 import { GUIDS } from '../core/constants.js';
@@ -1533,21 +1605,409 @@ import { getWorkspaceId } from '../core/config.js';
 import { throttle, setStatus, storage, upsertQueryParams } from '../utils.js';
 import { clearReportAreas } from '../ui/chart.js';
 import { loadRespondentAnswers } from '../features/respondentReport.js';
-let all=[], filtered=[], idx=-1, sel=null, opened=false;
-function openPanel(){ if(opened) return; opened=true; els.combo.classList.add('open'); els.panel.hidden=false; els.input.setAttribute('aria-expanded','true'); }
-function closePanel(){ if(!opened) return; opened=false; els.combo.classList.remove('open'); els.panel.hidden=true; els.input.setAttribute('aria-expanded','false'); els.input.removeAttribute('aria-activedescendant'); idx=-1; }
-function render(list){ els.list.innerHTML=''; if(!list.length){ const li=document.createElement('li'); li.className='empty'; li.textContent='No matches'; els.list.appendChild(li); return; } const frag=document.createDocumentFragment(); list.forEach((it,i)=>{ const li=document.createElement('li'); li.id=`resp-opt-${i}`; li.setAttribute('role','option'); li.dataset.value=it.value; li.textContent=it.text; li.addEventListener('mousedown',e=>{ e.preventDefault(); choose(i); }); frag.appendChild(li); }); els.list.appendChild(frag); }
-function highlight(i){ const opts=Array.from(els.list.querySelectorAll('[role="option"]')); opts.forEach((el,j)=>{ el.classList.toggle('active', j===i); el.setAttribute('aria-selected', j===i?'true':'false'); }); if(i>=0 && opts[i]){ const o=opts[i]; o.scrollIntoView({block:'nearest'}); els.input.setAttribute('aria-activedescendant', o.id); } else { els.input.removeAttribute('aria-activedescendant'); } idx=i; }
-function filter(term){ const t=String(term??'').toLowerCase(); filtered = t ? all.filter(r=> r.text.toLowerCase().includes(t)) : all.slice(); render(filtered); highlight(filtered.length?0:-1); }
-function clearKeepText(){ sel=null; }
-export function getSelectedRespondentId(){ return sel; }
-export function clearRespondentSelection(){ sel=null; els.input.value=''; els.input.removeAttribute('aria-activedescendant'); highlight(-1); if(opened) closePanel(); storage.del('r1.selectedRespondent'); upsertQueryParams({ respondentId:'' }); }
-function choose(i){ if(i<0 || i>=filtered.length) return; const {text,value}=filtered[i]; els.input.value=text; sel=value; storage.set('r1.selectedRespondent',{ id:sel, name:text }); upsertQueryParams({ respondentId:sel }); closePanel(); try{ clearReportAreas(); }catch{} setStatus('Loading respondent report…'); loadRespondentAnswers().catch(e=> setStatus(`Failed to load: ${e.message}`)); }
-export function selectRespondentById(id){ if(!id) return false; const i=all.findIndex(r=> String(r.value)===String(id)); if(i>=0){ const {text,value}=all[i]; els.input.value=text; sel=value; storage.set('r1.selectedRespondent',{ id:sel, name:text }); upsertQueryParams({ respondentId:sel }); try{ clearReportAreas(); }catch{} setStatus('Loading respondent report…'); loadRespondentAnswers().catch(e=> setStatus(`Failed to load: ${e.message}`)); return true; } return false; }
-export function initCombobox(){ els.input.addEventListener('focus', ()=>{ openPanel(); filter(els.input.value); }); els.input.addEventListener('click', ()=>{ openPanel(); filter(els.input.value); }); const thr=throttle(()=>{ filter(els.input.value); },150); els.input.addEventListener('input', ()=>{ clearKeepText(); if(!opened) openPanel(); thr(); }); els.input.addEventListener('keydown', e=>{ const has=filtered.length>0; switch(e.key){ case 'ArrowDown': e.preventDefault(); if(!opened) openPanel(); if(!has) return; highlight(Math.min(idx+1, filtered.length-1)); break; case 'ArrowUp': e.preventDefault(); if(!opened) openPanel(); if(!has) return; highlight(Math.max(idx-1, 0)); break; case 'Enter': if(opened && idx>=0){ e.preventDefault(); choose(idx); } break; case 'Escape': if(opened){ e.preventDefault(); closePanel(); } break; default: break; } }); document.addEventListener('mousedown', e=>{ if(!els.combo.contains(e.target)) closePanel(); }); all=[]; filtered=[]; els.list.innerHTML=''; els.input.value=''; sel=null; }
-export async function reloadRespondentsForVertical(guid){ all=[]; filtered=[]; sel=null; els.input.value=''; render(filtered); storage.del('r1.selectedRespondent'); upsertQueryParams({ respondentId:'' }); if(!guid) return; setStatus('Loading respondents for selected vertical…'); const ws=getWorkspaceId(); const base={ Request:{ ObjectType:{ GUID: GUIDS.ANSWER_OBJ }, fields:[{ GUID: GUIDS.RESPONDENT_REF }], condition:`'Question::Verticals' == CHOICE ${guid}`, sorts:[] } }; const rows=await fetchAllQuerySlim(ws, base, 1000); const by=new Map(); for(const o of rows){ const v=o?.Values?.[0]; if(!v) continue; const rid=v?.ArtifactID? String(v.ArtifactID) : null; const name=v?.Name ?? '(unnamed)'; const key=rid ?? `name:${name}`; if(!by.has(key)) by.set(key, { text:name, value: rid ?? name }); } all = Array.from(by.values()).sort((a,b)=> a.text.localeCompare(b.text, undefined, {sensitivity:'base'})); filtered=[]; els.list.innerHTML=''; setStatus(`Ready. (${all.length.toLocaleString()} eligible respondents)`); }
+import { activate, setReloadHandler, show } from './datRange.js';
 
+let all = [], filtered = [], idx = -1, sel = null, opened = false;
+
+function openPanel() {
+  if (opened) return;
+  opened = true;
+  els.combo.classList.add('open');
+  els.panel.hidden = false;
+  els.input.setAttribute('aria-expanded', 'true');
+}
+
+function closePanel() {
+  if (!opened) return;
+  opened = false;
+  els.combo.classList.remove('open');
+  els.panel.hidden = true;
+  els.input.setAttribute('aria-expanded', 'false');
+  els.input.removeAttribute('aria-activedescendant');
+  idx = -1;
+}
+
+function render(list) {
+  els.list.innerHTML = '';
+  if (!list.length) {
+    const li = document.createElement('li');
+    li.className = 'empty';
+    li.textContent = 'No matches';
+    els.list.appendChild(li);
+    return;
+  }
+  const frag = document.createDocumentFragment();
+  list.forEach((it, i) => {
+    const li = document.createElement('li');
+    li.id = `resp-opt-${i}`;
+    li.setAttribute('role', 'option');
+    li.dataset.value = it.value;
+    li.textContent = it.text;
+    li.addEventListener('mousedown', e => {
+      e.preventDefault();
+      choose(i);
+    });
+    frag.appendChild(li);
+  });
+  els.list.appendChild(frag);
+}
+
+function highlight(i) {
+  const opts = Array.from(els.list.querySelectorAll('[role="option"]'));
+  opts.forEach((el, j) => {
+    el.classList.toggle('active', j === i);
+    el.setAttribute('aria-selected', j === i ? 'true' : 'false');
+  });
+  if (i >= 0 && opts[i]) {
+    const o = opts[i];
+    o.scrollIntoView({ block: 'nearest' });
+    els.input.setAttribute('aria-activedescendant', o.id);
+  } else {
+    els.input.removeAttribute('aria-activedescendant');
+  }
+  idx = i;
+}
+
+function filter(term) {
+  const t = String(term ?? '').toLowerCase();
+  filtered = t ? all.filter(r => r.text.toLowerCase().includes(t)) : all.slice();
+  render(filtered);
+  highlight(filtered.length ? 0 : -1);
+}
+
+function clearKeepText() {
+  sel = null;
+}
+
+export function getSelectedRespondentId() {
+  return sel;
+}
+
+export function clearRespondentSelection() {
+  sel = null;
+  els.input.value = '';
+  els.input.removeAttribute('aria-activedescendant');
+  highlight(-1);
+  if (opened) closePanel();
+  storage.del('r1.selectedRespondent');
+  upsertQueryParams({ respondentId: '' });
+}
+
+function choose(i) {
+  if (i < 0 || i >= filtered.length) return;
+
+  const { text, value } = filtered[i];
+  els.input.value = text;
+  sel = value;
+
+  storage.set('r1.selectedRespondent', { id: sel, name: text });
+  upsertQueryParams({ respondentId: sel });
+
+  closePanel();
+
+  try { clearReportAreas(); } catch {}
+  setStatus('Loading respondent report…');
+
+  // DAT range controls become visible once respondent is selected
+  activate('respondent', { showControls: true });
+  show();
+
+  // changing DAT range should reload the currently selected respondent report
+  setReloadHandler(() => loadRespondentAnswers());
+
+  loadRespondentAnswers().catch(e => setStatus(`Failed to load: ${e.message}`));
+}
+
+export function selectRespondentById(id) {
+  if (!id) return false;
+  const i = all.findIndex(r => String(r.value) === String(id));
+  if (i >= 0) {
+    const { text, value } = all[i];
+    els.input.value = text;
+    sel = value;
+
+    storage.set('r1.selectedRespondent', { id: sel, name: text });
+    upsertQueryParams({ respondentId: sel });
+
+    try { clearReportAreas(); } catch {}
+    setStatus('Loading respondent report…');
+
+    activate('respondent', { showControls: true });
+    show();
+    setReloadHandler(() => loadRespondentAnswers());
+
+    loadRespondentAnswers().catch(e => setStatus(`Failed to load: ${e.message}`));
+    return true;
+  }
+  return false;
+}
+
+export function initCombobox() {
+  els.input.addEventListener('focus', () => { openPanel(); filter(els.input.value); });
+  els.input.addEventListener('click', () => { openPanel(); filter(els.input.value); });
+
+  const thr = throttle(() => { filter(els.input.value); }, 150);
+
+  els.input.addEventListener('input', () => {
+    clearKeepText();
+    if (!opened) openPanel();
+    thr();
+  });
+
+  els.input.addEventListener('keydown', e => {
+    const has = filtered.length > 0;
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        if (!opened) openPanel();
+        if (!has) return;
+        highlight(Math.min(idx + 1, filtered.length - 1));
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        if (!opened) openPanel();
+        if (!has) return;
+        highlight(Math.max(idx - 1, 0));
+        break;
+      case 'Enter':
+        if (opened && idx >= 0) {
+          e.preventDefault();
+          choose(idx);
+        }
+        break;
+      case 'Escape':
+        if (opened) {
+          e.preventDefault();
+          closePanel();
+        }
+        break;
+      default:
+        break;
+    }
+  });
+
+  document.addEventListener('mousedown', e => {
+    if (!els.combo.contains(e.target)) closePanel();
+  });
+
+  all = [];
+  filtered = [];
+  els.list.innerHTML = '';
+  els.input.value = '';
+  sel = null;
+}
+
+export async function reloadRespondentsForVertical(guid) {
+  all = [];
+  filtered = [];
+  sel = null;
+
+  els.input.value = '';
+  render(filtered);
+
+  storage.del('r1.selectedRespondent');
+  upsertQueryParams({ respondentId: '' });
+
+  if (!guid) return;
+
+  setStatus('Loading respondents for selected vertical…');
+
+  const ws = getWorkspaceId();
+  const base = {
+    Request: {
+      ObjectType: { GUID: GUIDS.ANSWER_OBJ },
+      fields: [{ GUID: GUIDS.RESPONDENT_REF }],
+      condition: `'Question::Verticals' == CHOICE ${guid}`,
+      sorts: [],
+    },
+  };
+
+  const rows = await fetchAllQuerySlim(ws, base, 1000);
+
+  const by = new Map();
+  for (const o of rows) {
+    const v = o?.Values?.[0];
+    if (!v) continue;
+    const rid = v?.ArtifactID ? String(v.ArtifactID) : null;
+    const name = v?.Name ?? '(unnamed)';
+    const key = rid ?? `name:${name}`;
+    if (!by.has(key)) by.set(key, { text: name, value: rid ?? name });
+  }
+
+  all = Array.from(by.values()).sort((a, b) =>
+    a.text.localeCompare(b.text, undefined, { sensitivity: 'base' }),
+  );
+
+  filtered = [];
+  els.list.innerHTML = '';
+
+  setStatus(`Ready. (${all.length.toLocaleString()} eligible respondents)`);
+}
 ----- END FILE: assets/js/ui/combobox.js -----
+
+----- BEGIN FILE: assets/js/ui/datRange.js -----
+(sha1: 939b8b7cba227aa25099126c7ea76e06621c3a46)
+
+// assets/js/ui/datRange.js
+// Centralized DAT range UI + state.
+// - Hidden by default (index.html sets hidden)
+// - Shown when context is activated (vertical tab click or respondent select)
+// - Options populated only with relevant DATs once a report loads
+// - Prevents invalid ranges (From > To)
+// - Auto-reloads active context on change (if a reload handler is set)
+
+let initialized = false;
+let suppressChange = false;
+
+let context = null;          // 'vertical' | 'respondent' | null
+let reloadHandler = null;    // () => Promise|void
+let currentDats = [];        // array of DAT names currently available
+let selectedFrom = null;
+let selectedTo = null;
+
+function elControls() { return document.getElementById('dat-range-controls'); }
+function elFrom() { return document.getElementById('datFromSelect'); }
+function elTo() { return document.getElementById('datToSelect'); }
+
+export function hide() {
+  const c = elControls();
+  if (c) c.hidden = true;
+}
+
+export function show() {
+  const c = elControls();
+  if (c) c.hidden = false;
+}
+
+export function clearOptionsAndDisable() {
+  const from = elFrom();
+  const to = elTo();
+  if (from) from.innerHTML = '';
+  if (to) to.innerHTML = '';
+  currentDats = [];
+  selectedFrom = null;
+  selectedTo = null;
+}
+
+export function activate(newContext, { showControls = true, onReload = null } = {}) {
+  context = newContext ?? context;
+  reloadHandler = typeof onReload === 'function' ? onReload : reloadHandler;
+  if (showControls) show();
+}
+
+export function setReloadHandler(fn) {
+  reloadHandler = typeof fn === 'function' ? fn : null;
+}
+
+export function getRange() {
+  return { from: selectedFrom, to: selectedTo };
+}
+
+// Disable options so From cannot be after To, and To cannot be before From.
+function applyOptionDisables() {
+  const fromSel = elFrom();
+  const toSel = elTo();
+  if (!fromSel || !toSel) return;
+
+  const fromIdx = currentDats.indexOf(fromSel.value);
+  const toIdx = currentDats.indexOf(toSel.value);
+
+  // Disable From options greater than current To
+  [...fromSel.options].forEach((opt, i) => {
+    opt.disabled = toIdx >= 0 ? i > toIdx : false;
+  });
+
+  // Disable To options less than current From
+  [...toSel.options].forEach((opt, i) => {
+    opt.disabled = fromIdx >= 0 ? i < fromIdx : false;
+  });
+}
+
+function clampInvalidRange() {
+  const fromSel = elFrom();
+  const toSel = elTo();
+  if (!fromSel || !toSel) return;
+
+  const fromIdx = currentDats.indexOf(fromSel.value);
+  const toIdx = currentDats.indexOf(toSel.value);
+
+  if (fromIdx >= 0 && toIdx >= 0 && fromIdx > toIdx) {
+    // Clamp: snap To up to From
+    toSel.value = fromSel.value;
+  }
+
+  selectedFrom = fromSel.value || null;
+  selectedTo = toSel.value || null;
+
+  applyOptionDisables();
+}
+
+async function triggerReloadIfPossible() {
+  if (typeof reloadHandler !== 'function') return;
+  try {
+    await reloadHandler();
+  } catch (e) {
+    // best-effort; caller will usually set status message
+    console.error('[DAT] reload failed', e);
+  }
+}
+
+function onSelectChange() {
+  if (suppressChange) return;
+  clampInvalidRange();
+  triggerReloadIfPossible();
+}
+
+export function init() {
+  if (initialized) return;
+  initialized = true;
+
+  const fromSel = elFrom();
+  const toSel = elTo();
+  if (fromSel) fromSel.addEventListener('change', onSelectChange);
+  if (toSel) toSel.addEventListener('change', onSelectChange);
+}
+
+// Set the available DAT options. If empty, hide the control entirely.
+// Preserves previous selection when possible, otherwise clamps to ends.
+export function setOptions(dats, { hideIfEmpty = true } = {}) {
+  const fromSel = elFrom();
+  const toSel = elTo();
+  if (!fromSel || !toSel) return;
+
+  currentDats = Array.isArray(dats) ? dats.slice() : [];
+
+  if (currentDats.length === 0) {
+    clearOptionsAndDisable();
+    if (hideIfEmpty) hide();
+    return;
+  }
+
+  show();
+
+  // Preserve old selections if still valid
+  const oldFrom = selectedFrom;
+  const oldTo = selectedTo;
+
+  suppressChange = true;
+  try {
+    fromSel.innerHTML = '';
+    toSel.innerHTML = '';
+
+    for (const d of currentDats) {
+      fromSel.add(new Option(d, d));
+      toSel.add(new Option(d, d));
+    }
+
+    fromSel.value = (oldFrom && currentDats.includes(oldFrom)) ? oldFrom : currentDats[0];
+    toSel.value = (oldTo && currentDats.includes(oldTo)) ? oldTo : currentDats[currentDats.length - 1];
+
+    clampInvalidRange();
+  } finally {
+    suppressChange = false;
+  }
+}
+----- END FILE: assets/js/ui/datRange.js -----
 
 ----- BEGIN FILE: assets/js/ui/longText.js -----
 (sha1: 0f281dc0e49191062c368e144b4f34f355fc8bef)
@@ -2168,12 +2628,10 @@ export const storage = {
 ----- END FILE: assets/js/utils.js -----
 
 ----- BEGIN FILE: index.html -----
-(sha1: f364e69c6572c2e5403cf1ffa88a5a4840861c6a)
-
+(sha1: 60edd869d68812f67031ba39efb94a348645e6c5)
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -2204,7 +2662,6 @@ export const storage = {
       outline: none !important;
       filter: none !important;
     }
-
     #team-button-bar .team-tab,
     #team-button-bar .team-tab * {
       background: transparent !important;
@@ -2221,14 +2678,12 @@ export const storage = {
 </head>
 
 <body>
-
   <main>
     <!-- Print-only dynamic report header (populated at runtime) -->
     <div id="print-report-header" class="print-only-report-header"></div>
 
     <!-- Floating Print / Export button (shown when a report is loaded) -->
     <button id="floatingPrintBtn" class="floating-print-btn" hidden title="Print / Export PDF" aria-label="Print / Export PDF">
-      <!-- Minimal print/PDF icon (Option 1) -->
       <svg viewBox="0 0 24 24" width="20" height="20" fill="white" aria-hidden="true" focusable="false">
         <path d="M6 2h12v4h4v10h-4v6H6v-6H2V6h4V2zm2 0v4h8V2H8zm8 18v-4H8v4h8zM4 8v6h16V8H4z"/>
       </svg>
@@ -2241,27 +2696,49 @@ export const storage = {
 
     <section class="controls" aria-labelledby="controls-label">
       <h2 id="controls-label" class="sr-only">Controls</h2>
+
       <div id="respondentDropdown" class="control-group">
         <div id="respondentCombo" class="combo" aria-label="Respondent filter">
           <label for="respondentFilter" class="sr-only">Select respondent</label>
-          <input id="respondentFilter" type="search" placeholder="Select a respondent from the list…" autocomplete="off"
-            aria-label="Select respondent" role="combobox" aria-autocomplete="list" aria-expanded="false"
-            aria-haspopup="listbox" aria-controls="respondentList" />
+          <input
+            id="respondentFilter"
+            type="search"
+            placeholder="Select a respondent from the list…"
+            autocomplete="off"
+            aria-label="Select respondent"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-haspopup="listbox"
+            aria-controls="respondentList"
+          />
           <div id="respondentPanel" class="combo-panel" hidden>
             <ul id="respondentList" role="listbox" tabindex="-1" aria-label="Respondents"></ul>
           </div>
         </div>
+
         <button id="loadVerticalBtn" type="button" class="btn btn--secondary" aria-label="Load Vertical Report">
           Load Vertical Report
         </button>
+      </div>
+
+      <!-- ✅ DAT Range Controls (hidden until a vertical or respondent is selected) -->
+      <div class="control-group" id="dat-range-controls" aria-label="DAT range filter" hidden>
+        <label for="datFromSelect">From DAT</label>
+        <select id="datFromSelect" aria-label="From DAT"></select>
+
+        <label for="datToSelect">To DAT</label>
+        <select id="datToSelect" aria-label="To DAT"></select>
       </div>
     </section>
 
     <section aria-labelledby="chart-label">
       <h2 id="chart-label" class="sr-only">Combined answer score over DAT surveys</h2>
+
       <div class="chart-container" hidden>
         <canvas id="answersChart" aria-label="Answers chart" role="img"></canvas>
       </div>
+
       <div id="chartStatus" class="status" aria-live="polite">Ready.</div>
     </section>
 
@@ -2270,9 +2747,7 @@ export const storage = {
     </section>
   </main>
 </body>
-
 </html>
-
 ----- END FILE: index.html -----
 
 ## Included files
@@ -2293,6 +2768,7 @@ assets/js/features/verticalReport.js
 assets/js/index.js
 assets/js/ui/chart.js
 assets/js/ui/combobox.js
+assets/js/ui/datRange.js
 assets/js/ui/longText.js
 assets/js/ui/multiChoice.js
 assets/js/ui/scoreChanges.js
