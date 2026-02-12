@@ -1,7 +1,5 @@
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -32,7 +30,6 @@
       outline: none !important;
       filter: none !important;
     }
-
     #team-button-bar .team-tab,
     #team-button-bar .team-tab * {
       background: transparent !important;
@@ -49,14 +46,12 @@
 </head>
 
 <body>
-
   <main>
     <!-- Print-only dynamic report header (populated at runtime) -->
     <div id="print-report-header" class="print-only-report-header"></div>
 
     <!-- Floating Print / Export button (shown when a report is loaded) -->
     <button id="floatingPrintBtn" class="floating-print-btn" hidden title="Print / Export PDF" aria-label="Print / Export PDF">
-      <!-- Minimal print/PDF icon (Option 1) -->
       <svg viewBox="0 0 24 24" width="20" height="20" fill="white" aria-hidden="true" focusable="false">
         <path d="M6 2h12v4h4v10h-4v6H6v-6H2V6h4V2zm2 0v4h8V2H8zm8 18v-4H8v4h8zM4 8v6h16V8H4z"/>
       </svg>
@@ -69,27 +64,49 @@
 
     <section class="controls" aria-labelledby="controls-label">
       <h2 id="controls-label" class="sr-only">Controls</h2>
+
       <div id="respondentDropdown" class="control-group">
         <div id="respondentCombo" class="combo" aria-label="Respondent filter">
           <label for="respondentFilter" class="sr-only">Select respondent</label>
-          <input id="respondentFilter" type="search" placeholder="Select a respondent from the list…" autocomplete="off"
-            aria-label="Select respondent" role="combobox" aria-autocomplete="list" aria-expanded="false"
-            aria-haspopup="listbox" aria-controls="respondentList" />
+          <input
+            id="respondentFilter"
+            type="search"
+            placeholder="Select a respondent from the list…"
+            autocomplete="off"
+            aria-label="Select respondent"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-haspopup="listbox"
+            aria-controls="respondentList"
+          />
           <div id="respondentPanel" class="combo-panel" hidden>
             <ul id="respondentList" role="listbox" tabindex="-1" aria-label="Respondents"></ul>
           </div>
         </div>
+
         <button id="loadVerticalBtn" type="button" class="btn btn--secondary" aria-label="Load Vertical Report">
           Load Vertical Report
         </button>
+      </div>
+
+      <!-- ✅ DAT Range Controls (hidden until a vertical or respondent is selected) -->
+      <div class="control-group" id="dat-range-controls" aria-label="DAT range filter" hidden>
+        <label for="datFromSelect">From DAT</label>
+        <select id="datFromSelect" aria-label="From DAT"></select>
+
+        <label for="datToSelect">To DAT</label>
+        <select id="datToSelect" aria-label="To DAT"></select>
       </div>
     </section>
 
     <section aria-labelledby="chart-label">
       <h2 id="chart-label" class="sr-only">Combined answer score over DAT surveys</h2>
+
       <div class="chart-container" hidden>
         <canvas id="answersChart" aria-label="Answers chart" role="img"></canvas>
       </div>
+
       <div id="chartStatus" class="status" aria-live="polite">Ready.</div>
     </section>
 
@@ -98,5 +115,4 @@
     </section>
   </main>
 </body>
-
 </html>

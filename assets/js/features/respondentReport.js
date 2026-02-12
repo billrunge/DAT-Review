@@ -1,4 +1,3 @@
-
 // assets/js/features/respondentReport.js
 import { els } from "../core/domRefs.js";
 import { GUIDS } from "../core/constants.js";
@@ -16,11 +15,16 @@ import { loadRespondentLongTextAnswers } from "../ui/longText.js";
 import { renderScoreChanges } from "../ui/scoreChanges.js";
 import { getSelectedRespondentId } from "../ui/combobox.js";
 import { setPrintHeader } from "../app.js";
+import { init, activate, setReloadHandler, setOptions, getRange, show } from "../ui/datRange.js";
 
 export async function loadRespondentAnswers() {
+  init();
+
   if (els.mcSection) els.mcSection.hidden = true;
+
   const sc = document.getElementById("score-change-section");
   if (sc) sc.hidden = true;
+
   const lt = document.getElementById("longtext-section");
   if (lt) lt.hidden = true;
 
@@ -31,27 +35,33 @@ export async function loadRespondentAnswers() {
     return;
   }
 
-  // Set the dynamic print header with respondent + active vertical (if present)
+  // Make DAT controls visible once a respondent is selected/loaded
+  activate('respondent', { showControls: true });
+  show();
+
+  // Auto reload respondent report on DAT range change
+  setReloadHandler(async () => {
+    await loadRespondentAnswers();
+  });
+
   const respondentName = els.input?.value || "Selected respondent";
   const activeTab = els.teamBar?.querySelector("button.team-tab.active");
   const verticalName = activeTab?.dataset?.label || "";
-  const header = verticalName
-    ? `${respondentName} — ${verticalName}`
-    : `${respondentName}`;
+  const header = verticalName ? `${respondentName} — ${verticalName}` : `${respondentName}`;
   setPrintHeader(header);
 
   setStatus("Loading respondent chart…");
-  const ws = getWorkspaceId();
 
+  const ws = getWorkspaceId();
   const base = {
     Request: {
       ObjectType: { GUID: GUIDS.ANSWER_OBJ },
       fields: [
-        { GUID: GUIDS.QUESTION_ID }, // [0]
-        { GUID: GUIDS.SINGLE_CHOICE }, // [1]
-        { GUID: GUIDS.DAT }, // [2]
-        { GUID: GUIDS.YES_NO }, // [3]
-        { GUID: GUIDS.QUESTION_TEXT }, // [4]
+        { GUID: GUIDS.QUESTION_ID },     // [0]
+        { GUID: GUIDS.SINGLE_CHOICE },   // [1]
+        { GUID: GUIDS.DAT },             // [2]
+        { GUID: GUIDS.YES_NO },          // [3]
+        { GUID: GUIDS.QUESTION_TEXT },   // [4]
       ],
       condition:
         `('Respondent' IN OBJECT [${id}] AND (` +
@@ -63,10 +73,28 @@ export async function loadRespondentAnswers() {
 
   const rows = await fetchAllQuerySlim(ws, base, 1000);
 
-  const periods = Array.from(
-    new Set(rows.map((r) => r.Values?.[2]?.Name).filter(Boolean)),
-  );
+  // Determine relevant DATs for this respondent
+  const presentSet = new Set(rows.map(r => r.Values?.[2]?.Name).filter(Boolean));
+  const periodsAll = Array.from(presentSet);
+  periodsAll.sort(compareDatNames);
+
+  // Populate dropdowns with relevant respondent DATs (hide if none)
+  setOptions(periodsAll, { hideIfEmpty: true });
+
+  // Apply DAT range
+  const { from, to } = getRange();
+  let periods = periodsAll.slice();
+
+  if (from && to) {
+    periods = periods.filter(p => compareDatNames(p, from) >= 0 && compareDatNames(p, to) <= 0);
+  }
   periods.sort(compareDatNames);
+
+  if (periods.length === 0) {
+    setStatus("No DATs available for this respondent in the selected range.");
+    return;
+  }
+
   const earliest = periods[0];
   const latest = periods[periods.length - 1];
 
@@ -80,6 +108,8 @@ export async function loadRespondentAnswers() {
     const raw = r?.Values?.[1]?.Name ?? r?.Values?.[3]?.Name ?? 0;
 
     if (!q || !p) return;
+    if (!periods.includes(p)) return;
+
     series[q] ??= {};
     series[q][p] = mapAnswer(raw);
     if (qt && !qTextMap[q]) qTextMap[q] = qt;
@@ -100,15 +130,16 @@ export async function loadRespondentAnswers() {
 
   const changes = [];
   Object.keys(series).forEach((q) => {
-    const from = series[q][earliest];
-    const to = series[q][latest];
-    if (!Number.isFinite(from) || !Number.isFinite(to)) return;
+    const fromVal = series[q][earliest];
+    const toVal = series[q][latest];
+    if (!Number.isFinite(fromVal) || !Number.isFinite(toVal)) return;
+
     changes.push({
       qId: q,
       qText: qTextMap[q] ?? q,
-      from,
-      to,
-      delta: to - from,
+      from: fromVal,
+      to: toVal,
+      delta: toVal - fromVal,
     });
   });
 
@@ -127,7 +158,6 @@ export async function loadRespondentAnswers() {
 
   setStatus(`Chart updated. (${rows.length.toLocaleString()} records)`);
 
-  // SHOW floating print button
   const fp = document.getElementById("floatingPrintBtn");
   if (fp) fp.hidden = false;
 }
@@ -154,6 +184,7 @@ function renderExtremes(rows, series, periods, map) {
     const vals = periods
       .map((p) => series[q]?.[p])
       .filter((v) => Number.isFinite(v));
+
     if (!vals.length) return;
     const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
     out.push({ qId: q, qText: map[q] ?? q, avg });
@@ -165,8 +196,7 @@ function renderExtremes(rows, series, periods, map) {
   const lowest = out.slice(0, 5);
   const highest = out.slice(-5).reverse();
 
-  const anchor =
-    document.getElementById("score-change-section") || els.mcSection;
+  const anchor = document.getElementById("score-change-section") || els.mcSection;
   const parent = anchor?.parentNode || document.body;
 
   document.getElementById("extremes-section")?.remove();
@@ -207,12 +237,13 @@ function renderExtremes(rows, series, periods, map) {
 
       b.appendChild(strong);
       b.appendChild(sub);
+
       row.appendChild(q);
       row.appendChild(b);
-
       li.appendChild(row);
       ul.appendChild(li);
     });
+
     card.appendChild(ul);
   };
 

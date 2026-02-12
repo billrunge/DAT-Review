@@ -1,7 +1,5 @@
-
 // assets/js/ui/chart.js
 // Centralized Chart.js configuration + helpers used by the DAT Review page.
-
 import { els } from '../core/domRefs.js';
 import { clearTeamStrengths } from './teamStrengths.js';
 
@@ -14,11 +12,11 @@ function cssVar(name) {
 }
 
 function theme() {
-  const text   = cssVar('--text') || '#0f172a';
-  const grid   = cssVar('--border') || '#e5e8f0';
-  const brand  = cssVar('--brand') || '#2b5eff';
+  const text = cssVar('--text') || '#0f172a';
+  const grid = cssVar('--border') || '#e5e8f0';
+  const brand = cssVar('--brand') || '#2b5eff';
   const brandA = cssVar('--brand-alpha-20') || 'rgba(43,94,255,.20)';
-  const font   = cssVar('--font-sans') || 'system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif';
+  const font = cssVar('--font-sans') || 'system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif';
   const tooltipBg = cssVar('--tooltip-bg') || cssVar('--bg') || '#ffffff';
   return { text, grid, brand, brandA, font, tooltipBg };
 }
@@ -37,22 +35,23 @@ function applyChartDefaults() {
   Chart.defaults.plugins.tooltip = Chart.defaults.plugins.tooltip || {};
   Chart.defaults.plugins.tooltip.enabled = true;
   Chart.defaults.plugins.tooltip.titleColor = t.text;
-  Chart.defaults.plugins.tooltip.bodyColor  = t.text;
+  Chart.defaults.plugins.tooltip.bodyColor = t.text;
   Chart.defaults.plugins.tooltip.backgroundColor = t.tooltipBg;
-  Chart.defaults.plugins.tooltip.borderColor     = t.grid;
-  Chart.defaults.plugins.tooltip.borderWidth     = 1;
-  Chart.defaults.plugins.tooltip.padding         = 10;
-  Chart.defaults.plugins.tooltip.displayColors   = true;
-  Chart.defaults.plugins.tooltip.boxWidth        = 8;
-  Chart.defaults.plugins.tooltip.boxHeight       = 8;
-  Chart.defaults.plugins.tooltip.boxPadding      = 4;
+  Chart.defaults.plugins.tooltip.borderColor = t.grid;
+  Chart.defaults.plugins.tooltip.borderWidth = 1;
+  Chart.defaults.plugins.tooltip.padding = 10;
+  Chart.defaults.plugins.tooltip.displayColors = true;
+  Chart.defaults.plugins.tooltip.boxWidth = 8;
+  Chart.defaults.plugins.tooltip.boxHeight = 8;
+  Chart.defaults.plugins.tooltip.boxPadding = 4;
 
   Chart.defaults.scales = Chart.defaults.scales || {};
   Chart.defaults.scales.x = Chart.defaults.scales.x || {};
   Chart.defaults.scales.y = Chart.defaults.scales.y || {};
-  Chart.defaults.scales.x.grid  = { ...(Chart.defaults.scales.x.grid  || {}), color: t.grid };
+
+  Chart.defaults.scales.x.grid = { ...(Chart.defaults.scales.x.grid || {}), color: t.grid };
   Chart.defaults.scales.x.ticks = { ...(Chart.defaults.scales.x.ticks || {}), color: t.text };
-  Chart.defaults.scales.y.grid  = { ...(Chart.defaults.scales.y.grid  || {}), color: t.grid };
+  Chart.defaults.scales.y.grid = { ...(Chart.defaults.scales.y.grid || {}), color: t.grid };
   Chart.defaults.scales.y.ticks = { ...(Chart.defaults.scales.y.ticks || {}), color: t.text };
 }
 
@@ -61,6 +60,7 @@ const themeObserver = new MutationObserver(() => {
   const c = getChart();
   if (c) c.update();
 });
+
 try {
   themeObserver.observe(document.documentElement, {
     attributes: true,
@@ -68,7 +68,9 @@ try {
   });
 } catch {}
 
-function getChart() { return chart || null; }
+function getChart() {
+  return chart || null;
+}
 
 export function destroyChart() {
   const c = getChart();
@@ -96,7 +98,7 @@ export function ensureChart() {
     chart = new Chart(canvas, {
       type: 'bar',
       data: { labels: [], datasets: [] },
-      options: { responsive: true, maintainAspectRatio: true, animation: { duration: 250 } }
+      options: { responsive: true, maintainAspectRatio: true, animation: { duration: 250 } },
     });
   }
   return chart;
@@ -106,13 +108,13 @@ export function replaceChartData(labels, totals, datasetLabel = 'Total score') {
   const container =
     (els?.chartCanvas && els.chartCanvas.parentElement) ||
     document.getElementById('answersChart')?.parentElement;
+
   if (container) container.hidden = false;
 
   const c = ensureChart();
   if (!c) return;
 
   const t = theme();
-
   c.data.labels = Array.isArray(labels) ? labels : [];
   c.data.datasets = [
     {
@@ -123,7 +125,7 @@ export function replaceChartData(labels, totals, datasetLabel = 'Total score') {
       borderColor: t.brand,
       borderWidth: 1.25,
       borderRadius: 6,
-    }
+    },
   ];
 
   c.options = {
@@ -136,9 +138,9 @@ export function replaceChartData(labels, totals, datasetLabel = 'Total score') {
             const v = ctx.raw;
             const val = Number.isFinite(v) ? v : '—';
             return `${ctx.dataset.label}: ${val}`;
-          }
-        }
-      }
+          },
+        },
+      },
     },
     scales: {
       y: {
@@ -153,9 +155,9 @@ export function replaceChartData(labels, totals, datasetLabel = 'Total score') {
       },
       x: {
         ticks: { autoSkip: true, maxRotation: 0, color: theme().text },
-        grid: { color: theme().grid }
-      }
-    }
+        grid: { color: theme().grid },
+      },
+    },
   };
 
   c.update();
@@ -163,14 +165,20 @@ export function replaceChartData(labels, totals, datasetLabel = 'Total score') {
 
 export function clearReportAreas() {
   try { destroyChart(); } catch {}
+
   const container =
     (els?.chartCanvas && els.chartCanvas.parentElement) ||
     document.getElementById('answersChart')?.parentElement;
+
   if (container) container.hidden = true;
 
   // Hide floating print button
-  const fp = document.getElementById("floatingPrintBtn");
+  const fp = document.getElementById('floatingPrintBtn');
   if (fp) fp.hidden = true;
+
+  // Hide DAT range controls when clearing reports
+  const datCtl = document.getElementById('dat-range-controls');
+  if (datCtl) datCtl.hidden = true;
 
   // Also clear Strengths & Training Needs
   try { clearTeamStrengths(); } catch {}

@@ -10,14 +10,14 @@ import { renderScoreChanges } from '../ui/scoreChanges.js';
 import { reloadRespondentsForVertical } from '../ui/combobox.js';
 import { renderTeamStrengths } from '../ui/teamStrengths.js';
 import { setPrintHeader } from '../app.js';
+import { init, activate, setReloadHandler, setOptions, getRange, show } from '../ui/datRange.js';
 
-/**
- * Tiny improvement:
- * Get the master DAT list from the DAT object type, sort it deterministically,
- * then filter to only DATs present in the answer rows we loaded for the report.
- * This avoids Set insertion-order surprises from QuerySlim row ordering.
- */
+let allDatNamesCache = null;
+let lastLoadedVerticalChoice = null;
+
 async function getAllDatNames() {
+  if (Array.isArray(allDatNamesCache) && allDatNamesCache.length) return allDatNamesCache;
+
   const wsId = getWorkspaceId();
   const base = {
     Request: {
@@ -27,17 +27,20 @@ async function getAllDatNames() {
       sorts: [],
     },
   };
+
   const rows = await fetchAllQuerySlim(wsId, base, 1000);
   const names = rows
-    .map((o) => o?.Values?.[0]?.Name ?? o?.Values?.[0] ?? '')
+    .map(o => o?.Values?.[0]?.Name ?? o?.Values?.[0] ?? '')
     .filter(Boolean);
 
-  // Deterministic chronological ordering (Qx YYYY)
   names.sort(compareDatNames);
+  allDatNamesCache = names;
   return names;
 }
 
 export async function loadVerticals() {
+  init(); // initialize DAT range control listeners
+
   const wsId = getWorkspaceId();
   const body = { FieldIdentifier: { Guids: [GUIDS.VERTICALS_FIELD] } };
   const data = await fetchJson(ROUTES.choiceParents(wsId), {
@@ -45,10 +48,7 @@ export async function loadVerticals() {
     body: JSON.stringify(body),
   });
 
-  data.sort((a, b) =>
-    (a?.Name ?? '').localeCompare(b?.Name ?? '', undefined, { sensitivity: 'base' }),
-  );
-
+  data.sort((a, b) => (a?.Name ?? '').localeCompare(b?.Name ?? '', undefined, { sensitivity: 'base' }));
   renderTeamButtons(data);
 }
 
@@ -75,6 +75,15 @@ function renderTeamButtons(data) {
 
     btn.addEventListener('click', async () => {
       setActiveTab(container, btn);
+
+      // Selecting a vertical should reveal DAT controls (still empty until report loads)
+      activate('vertical', { showControls: true });
+      show();
+
+      // No auto-reload until a report is actually loaded
+      setReloadHandler(null);
+      lastLoadedVerticalChoice = null;
+
       clearReportAreas();
 
       if (btn.dataset.choiceGuid) {
@@ -82,11 +91,9 @@ function renderTeamButtons(data) {
       }
 
       setStatus('Choose a respondent or click "Load Vertical Report".');
-      // Clear header until a report is actually loaded
       setPrintHeader('');
 
-      // Hide floating button proactively on tab switch
-      const fp = document.getElementById('floatingPrintBtn');
+      const fp = document.getElementById("floatingPrintBtn");
       if (fp) fp.hidden = true;
     });
 
@@ -97,12 +104,19 @@ function renderTeamButtons(data) {
   if (first) {
     setActiveTab(container, first);
     requestAnimationFrame(async () => {
+      // Selecting a vertical should reveal DAT controls
+      activate('vertical', { showControls: true });
+      show();
+
+      setReloadHandler(null);
+      lastLoadedVerticalChoice = null;
+
       if (first.dataset.choiceGuid) {
         await reloadRespondentsForVertical(first.dataset.choiceGuid);
       }
       setStatus('Choose a respondent or click "Load Vertical Report".');
       setPrintHeader('');
-      const fp = document.getElementById('floatingPrintBtn');
+      const fp = document.getElementById("floatingPrintBtn");
       if (fp) fp.hidden = true;
     });
   }
@@ -128,11 +142,18 @@ function setActiveTab(container, newActive) {
 }
 
 export async function loadTeamAnswers(verticalChoice) {
+  lastLoadedVerticalChoice = verticalChoice;
+
+  // Auto-reload when DAT range changes, once a vertical report has been loaded
+  setReloadHandler(async () => {
+    if (!lastLoadedVerticalChoice) return;
+    await loadTeamAnswers(lastLoadedVerticalChoice);
+  });
+
   if (els.mcSection) els.mcSection.hidden = true;
 
   setStatus(`Loading team answers for ${verticalChoice?.name ?? 'selected vertical'}…`);
 
-  // Set the dynamic print header for vertical reports
   if (verticalChoice?.name) setPrintHeader(`${verticalChoice.name}`);
   else setPrintHeader('Vertical Report');
 
@@ -158,16 +179,31 @@ export async function loadTeamAnswers(verticalChoice) {
   };
 
   const rows = await fetchAllQuerySlim(wsId, base, 1000);
-
   if (els.multiList) els.multiList.innerHTML = '';
 
-  // ---- Tiny improvement: determine DAT periods from DAT objects, then filter to those present in rows
+  // Relevant DATs only (avoid showing DAT ranges with no values)
   const allDats = await getAllDatNames();
-  const present = new Set(rows.map((r) => r.Values?.[2]?.Name).filter(Boolean));
-  const periods = allDats.filter((d) => present.has(d));
+  const present = new Set(rows.map(r => r.Values?.[2]?.Name).filter(Boolean));
+  const relevantDats = allDats.filter(d => present.has(d));
 
-  // Defensive: ensure sorted even if upstream changes
+  // Populate dropdowns with relevant DATs (or hide controls if none)
+  setOptions(relevantDats, { hideIfEmpty: true });
+
+  // Apply selected range
+  const { from, to } = getRange();
+  let periods = relevantDats.slice();
+
+  if (from && to) {
+    periods = periods.filter(d => compareDatNames(d, from) >= 0 && compareDatNames(d, to) <= 0);
+  }
+
   periods.sort(compareDatNames);
+
+  if (periods.length === 0) {
+    clearReportAreas();
+    setStatus('No DATs available for this vertical in the selected range.');
+    return;
+  }
 
   const earliest = periods[0];
   const latest = periods[periods.length - 1];
@@ -185,6 +221,7 @@ export async function loadTeamAnswers(verticalChoice) {
     const valRaw = single ?? yesno ?? 0;
 
     if (!qId || !period || !respondent) return;
+    if (!periods.includes(period)) return;
 
     series[qId] ??= {};
     series[qId][respondent] ??= {};
@@ -214,10 +251,8 @@ export async function loadTeamAnswers(verticalChoice) {
 
   replaceChartData(periods, totals);
 
-  // Strengths & Training Needs section (latest DAT)
   renderTeamStrengths(rows, { topN: 5, minResponses: 2 });
 
-  // Load Multi-choice aggregation for team/vertical
   import('./teamMultiChoiceAgg.js').then((m) => m.loadTeamMultiChoiceAnswers(verticalChoice.guid));
 
   const changes = [];
@@ -241,16 +276,16 @@ export async function loadTeamAnswers(verticalChoice) {
       return count > 0 ? sum / count : NaN;
     };
 
-    const from = avg(earliest);
-    const to = avg(latest);
-    if (!Number.isFinite(from) || !Number.isFinite(to)) return;
+    const fromAvg = avg(earliest);
+    const toAvg = avg(latest);
+    if (!Number.isFinite(fromAvg) || !Number.isFinite(toAvg)) return;
 
     changes.push({
       qId,
       qText: qTextMap[qId] ?? qId,
-      from: Math.round(from * 100) / 100,
-      to: Math.round(to * 100) / 100,
-      delta: Math.round((to - from) * 100) / 100,
+      from: Math.round(fromAvg * 100) / 100,
+      to: Math.round(toAvg * 100) / 100,
+      delta: Math.round((toAvg - fromAvg) * 100) / 100,
     });
   });
 
@@ -264,7 +299,6 @@ export async function loadTeamAnswers(verticalChoice) {
 
   setStatus(`Team chart updated. (${rows.length.toLocaleString()} records)`);
 
-  // SHOW floating print button
-  const fp = document.getElementById('floatingPrintBtn');
+  const fp = document.getElementById("floatingPrintBtn");
   if (fp) fp.hidden = false;
 }
