@@ -1,50 +1,58 @@
-
 // assets/js/features/verticalReport.js
-import { els } from '../core/domRefs.js';
-import { GUIDS, ROUTES } from '../core/constants.js';
-import { fetchJson } from '../core/http.js';
-import { getWorkspaceId } from '../core/config.js';
-import { fetchAllQuerySlim } from '../core/graph.js';
-import { mapAnswer, setStatus, normalizeQuestion } from '../utils.js';
-import { replaceChartData, clearReportAreas } from '../ui/chart.js';
-import { renderScoreChanges } from '../ui/scoreChanges.js';
-import { reloadRespondentsForVertical } from '../ui/combobox.js';
-import { renderTeamStrengths } from '../ui/teamStrengths.js';
-import { setPrintHeader } from '../app.js';
+import { els } from "../core/domRefs.js";
+import { GUIDS, ROUTES } from "../core/constants.js";
+import { fetchJson } from "../core/http.js";
+import { getWorkspaceId } from "../core/config.js";
+import { fetchAllQuerySlim } from "../core/graph.js";
+import {
+  mapAnswer,
+  setStatus,
+  normalizeQuestion,
+  compareDatNames,
+} from "../utils.js";
+import { replaceChartData, clearReportAreas } from "../ui/chart.js";
+import { renderScoreChanges } from "../ui/scoreChanges.js";
+import { reloadRespondentsForVertical } from "../ui/combobox.js";
+import { renderTeamStrengths } from "../ui/teamStrengths.js";
+import { setPrintHeader } from "../app.js";
 
 export async function loadVerticals() {
   const wsId = getWorkspaceId();
   const body = { FieldIdentifier: { Guids: [GUIDS.VERTICALS_FIELD] } };
   const data = await fetchJson(ROUTES.choiceParents(wsId), {
-    method: 'POST',
+    method: "POST",
     body: JSON.stringify(body),
   });
-  data.sort((a, b) => (a?.Name ?? '').localeCompare(b?.Name ?? '', undefined, { sensitivity: 'base' }));
+  data.sort((a, b) =>
+    (a?.Name ?? "").localeCompare(b?.Name ?? "", undefined, {
+      sensitivity: "base",
+    }),
+  );
   renderTeamButtons(data);
 }
 
 function renderTeamButtons(data) {
   const container = els.teamBar;
-  container.innerHTML = '';
-  container.classList.add('team-tabs');
-  container.setAttribute('role', 'tablist');
-  container.setAttribute('aria-label', 'Verticals');
+  container.innerHTML = "";
+  container.classList.add("team-tabs");
+  container.setAttribute("role", "tablist");
+  container.setAttribute("aria-label", "Verticals");
 
   (data ?? []).forEach((team) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'team-tab';
-    btn.setAttribute('role', 'tab');
-    btn.setAttribute('aria-selected', 'false');
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "team-tab";
+    btn.setAttribute("role", "tab");
+    btn.setAttribute("aria-selected", "false");
     btn.tabIndex = -1;
 
-    const choiceGuid = team.Guids?.[0] ?? '';
+    const choiceGuid = team.Guids?.[0] ?? "";
     btn.dataset.choiceGuid = choiceGuid;
-    btn.dataset.artifactId = team.ArtifactID ?? '';
-    btn.dataset.label = team.Name ?? '';
+    btn.dataset.artifactId = team.ArtifactID ?? "";
+    btn.dataset.label = team.Name ?? "";
     btn.textContent = team.Name;
 
-    btn.addEventListener('click', async () => {
+    btn.addEventListener("click", async () => {
       setActiveTab(container, btn);
       clearReportAreas();
       if (btn.dataset.choiceGuid) {
@@ -52,7 +60,7 @@ function renderTeamButtons(data) {
       }
       setStatus('Choose a respondent or click "Load Vertical Report".');
       // Clear header until a report is actually loaded
-      setPrintHeader('');
+      setPrintHeader("");
 
       // Hide floating button proactively on tab switch
       const fp = document.getElementById("floatingPrintBtn");
@@ -70,43 +78,45 @@ function renderTeamButtons(data) {
         await reloadRespondentsForVertical(first.dataset.choiceGuid);
       }
       setStatus('Choose a respondent or click "Load Vertical Report".');
-      setPrintHeader('');
+      setPrintHeader("");
 
       const fp = document.getElementById("floatingPrintBtn");
       if (fp) fp.hidden = true;
     });
   }
 
-  container.addEventListener('keydown', (e) => {
+  container.addEventListener("keydown", (e) => {
     const tabs = [...container.querySelectorAll('button[role="tab"]')];
-    const active = container.querySelector('button.active');
+    const active = container.querySelector("button.active");
     const i = tabs.indexOf(active);
-    if (e.key === 'ArrowRight') tabs[i + 1]?.click();
-    if (e.key === 'ArrowLeft') tabs[i - 1]?.click();
+    if (e.key === "ArrowRight") tabs[i + 1]?.click();
+    if (e.key === "ArrowLeft") tabs[i - 1]?.click();
   });
 }
 
 function setActiveTab(container, newActive) {
   container.querySelectorAll('button[role="tab"]').forEach((b) => {
-    b.classList.remove('active');
-    b.setAttribute('aria-selected', 'false');
+    b.classList.remove("active");
+    b.setAttribute("aria-selected", "false");
     b.tabIndex = -1;
   });
-  newActive.classList.add('active');
-  newActive.setAttribute('aria-selected', 'true');
+  newActive.classList.add("active");
+  newActive.setAttribute("aria-selected", "true");
   newActive.tabIndex = 0;
 }
 
 export async function loadTeamAnswers(verticalChoice) {
   if (els.mcSection) els.mcSection.hidden = true;
 
-  setStatus(`Loading team answers for ${verticalChoice?.name ?? 'selected vertical'}…`);
+  setStatus(
+    `Loading team answers for ${verticalChoice?.name ?? "selected vertical"}…`,
+  );
 
   // Set the dynamic print header for vertical reports
   if (verticalChoice?.name) {
     setPrintHeader(`${verticalChoice.name}`);
   } else {
-    setPrintHeader('Vertical Report');
+    setPrintHeader("Vertical Report");
   }
 
   const wsId = getWorkspaceId();
@@ -114,26 +124,29 @@ export async function loadTeamAnswers(verticalChoice) {
     Request: {
       ObjectType: { GUID: GUIDS.ANSWER_OBJ },
       fields: [
-        { GUID: GUIDS.QUESTION_ID },    // [0]
-        { GUID: GUIDS.SINGLE_CHOICE },  // [1]
-        { GUID: GUIDS.DAT },            // [2]
+        { GUID: GUIDS.QUESTION_ID }, // [0]
+        { GUID: GUIDS.SINGLE_CHOICE }, // [1]
+        { GUID: GUIDS.DAT }, // [2]
         { GUID: GUIDS.RESPONDENT_REF }, // [3]
-        { GUID: GUIDS.YES_NO },         // [4]
-        { GUID: GUIDS.QUESTION_TEXT },  // [5]
+        { GUID: GUIDS.YES_NO }, // [4]
+        { GUID: GUIDS.QUESTION_TEXT }, // [5]
       ],
       condition:
         `('Question::Answer Type' == CHOICE ${GUIDS.TYPE_SINGLE} ` +
         `OR 'Question::Answer Type' == CHOICE ${GUIDS.TYPE_YESNO}) ` +
         `AND 'Question::Verticals' == CHOICE ${verticalChoice.guid}`,
-      sorts: [{ Direction: 'Ascending', FieldIdentifier: { GUID: GUIDS.DAT } }],
+      sorts: [{ Direction: "Ascending", FieldIdentifier: { GUID: GUIDS.DAT } }],
     },
   };
 
   const rows = await fetchAllQuerySlim(wsId, base, 1000);
 
-  if (els.multiList) els.multiList.innerHTML = '';
+  if (els.multiList) els.multiList.innerHTML = "";
 
-  const periods = [...new Set(rows.map((r) => r.Values?.[2]?.Name).filter(Boolean))];
+  const periods = [
+    ...new Set(rows.map((r) => r.Values?.[2]?.Name).filter(Boolean)),
+  ];
+  periods.sort(compareDatNames); // ✅ ensure chronological ordering
   const earliest = periods[0];
   const latest = periods[periods.length - 1];
 
@@ -181,13 +194,15 @@ export async function loadTeamAnswers(verticalChoice) {
 
   renderTeamStrengths(rows, { topN: 5, minResponses: 2 });
 
-  import('./teamMultiChoiceAgg.js').then((m) => m.loadTeamMultiChoiceAnswers(verticalChoice.guid));
+  import("./teamMultiChoiceAgg.js").then((m) =>
+    m.loadTeamMultiChoiceAnswers(verticalChoice.guid),
+  );
 
   const changes = [];
   Object.keys(series).forEach((qId) => {
     const respondents = Object.keys(series[qId] ?? {});
     const eligibleRespondents = respondents.filter((resp) =>
-      periods.every((p) => series[qId][resp][p] !== undefined)
+      periods.every((p) => series[qId][resp][p] !== undefined),
     );
     if (eligibleRespondents.length === 0) return;
 
@@ -222,7 +237,7 @@ export async function loadTeamAnswers(verticalChoice) {
     changes.filter((c) => c.delta < 0).sort((a, b) => a.delta - b.delta),
     earliest,
     latest,
-    5
+    5,
   );
 
   setStatus(`Team chart updated. (${rows.length.toLocaleString()} records)`);
