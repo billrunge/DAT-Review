@@ -1,6 +1,6 @@
 # Project Snapshot
-Generated: 2026-02-12T20:10:12Z
-Commit: b7ba43e
+Generated: 2026-05-04T21:05:28Z
+Commit: 58a71c8
 
 ----- BEGIN FILE: assets/css/bar-theme.css -----
 (sha1: afc71031800933e51fcef77aeb0059fc4477257c)
@@ -1036,74 +1036,97 @@ export async function loadTeamMultiChoiceAnswers(verticalChoiceGuid) {
 ----- END FILE: assets/js/features/teamMultiChoiceAgg.js -----
 
 ----- BEGIN FILE: assets/js/features/verticalReport.js -----
-(sha1: 30a283a5222e0a95a073b70398217692fcd7a76c)
+(sha1: 44b9d6ea16f4025900bbb1629e66a55b163608c1)
 
 // assets/js/features/verticalReport.js
-import { els } from "../core/domRefs.js";
-import { GUIDS, ROUTES } from "../core/constants.js";
-import { fetchJson } from "../core/http.js";
-import { getWorkspaceId } from "../core/config.js";
-import { fetchAllQuerySlim } from "../core/graph.js";
-import {
-  mapAnswer,
-  setStatus,
-  normalizeQuestion,
-  compareDatNames,
-} from "../utils.js";
-import { replaceChartData, clearReportAreas } from "../ui/chart.js";
-import { renderScoreChanges } from "../ui/scoreChanges.js";
-import { reloadRespondentsForVertical } from "../ui/combobox.js";
-import { renderTeamStrengths } from "../ui/teamStrengths.js";
-import { setPrintHeader } from "../app.js";
+import { els } from '../core/domRefs.js';
+import { GUIDS, ROUTES } from '../core/constants.js';
+import { fetchJson } from '../core/http.js';
+import { getWorkspaceId } from '../core/config.js';
+import { fetchAllQuerySlim } from '../core/graph.js';
+import { mapAnswer, setStatus, normalizeQuestion, compareDatNames } from '../utils.js';
+import { replaceChartData, clearReportAreas } from '../ui/chart.js';
+import { renderScoreChanges } from '../ui/scoreChanges.js';
+import { reloadRespondentsForVertical } from '../ui/combobox.js';
+import { renderTeamStrengths } from '../ui/teamStrengths.js';
+import { setPrintHeader } from '../app.js';
+
+/**
+ * Tiny improvement:
+ * Get the master DAT list from the DAT object type, sort it deterministically,
+ * then filter to only DATs present in the answer rows we loaded for the report.
+ * This avoids Set insertion-order surprises from QuerySlim row ordering.
+ */
+async function getAllDatNames() {
+  const wsId = getWorkspaceId();
+  const base = {
+    Request: {
+      ObjectType: { GUID: GUIDS.DAT_OBJ },
+      fields: [{ GUID: GUIDS.DAT_NAME }],
+      condition: '',
+      sorts: [],
+    },
+  };
+  const rows = await fetchAllQuerySlim(wsId, base, 1000);
+  const names = rows
+    .map((o) => o?.Values?.[0]?.Name ?? o?.Values?.[0] ?? '')
+    .filter(Boolean);
+
+  // Deterministic chronological ordering (Qx YYYY)
+  names.sort(compareDatNames);
+  return names;
+}
 
 export async function loadVerticals() {
   const wsId = getWorkspaceId();
   const body = { FieldIdentifier: { Guids: [GUIDS.VERTICALS_FIELD] } };
   const data = await fetchJson(ROUTES.choiceParents(wsId), {
-    method: "POST",
+    method: 'POST',
     body: JSON.stringify(body),
   });
+
   data.sort((a, b) =>
-    (a?.Name ?? "").localeCompare(b?.Name ?? "", undefined, {
-      sensitivity: "base",
-    }),
+    (a?.Name ?? '').localeCompare(b?.Name ?? '', undefined, { sensitivity: 'base' }),
   );
+
   renderTeamButtons(data);
 }
 
 function renderTeamButtons(data) {
   const container = els.teamBar;
-  container.innerHTML = "";
-  container.classList.add("team-tabs");
-  container.setAttribute("role", "tablist");
-  container.setAttribute("aria-label", "Verticals");
+  container.innerHTML = '';
+  container.classList.add('team-tabs');
+  container.setAttribute('role', 'tablist');
+  container.setAttribute('aria-label', 'Verticals');
 
   (data ?? []).forEach((team) => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "team-tab";
-    btn.setAttribute("role", "tab");
-    btn.setAttribute("aria-selected", "false");
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'team-tab';
+    btn.setAttribute('role', 'tab');
+    btn.setAttribute('aria-selected', 'false');
     btn.tabIndex = -1;
 
-    const choiceGuid = team.Guids?.[0] ?? "";
+    const choiceGuid = team.Guids?.[0] ?? '';
     btn.dataset.choiceGuid = choiceGuid;
-    btn.dataset.artifactId = team.ArtifactID ?? "";
-    btn.dataset.label = team.Name ?? "";
+    btn.dataset.artifactId = team.ArtifactID ?? '';
+    btn.dataset.label = team.Name ?? '';
     btn.textContent = team.Name;
 
-    btn.addEventListener("click", async () => {
+    btn.addEventListener('click', async () => {
       setActiveTab(container, btn);
       clearReportAreas();
+
       if (btn.dataset.choiceGuid) {
         await reloadRespondentsForVertical(btn.dataset.choiceGuid);
       }
+
       setStatus('Choose a respondent or click "Load Vertical Report".');
       // Clear header until a report is actually loaded
-      setPrintHeader("");
+      setPrintHeader('');
 
       // Hide floating button proactively on tab switch
-      const fp = document.getElementById("floatingPrintBtn");
+      const fp = document.getElementById('floatingPrintBtn');
       if (fp) fp.hidden = true;
     });
 
@@ -1118,75 +1141,74 @@ function renderTeamButtons(data) {
         await reloadRespondentsForVertical(first.dataset.choiceGuid);
       }
       setStatus('Choose a respondent or click "Load Vertical Report".');
-      setPrintHeader("");
-
-      const fp = document.getElementById("floatingPrintBtn");
+      setPrintHeader('');
+      const fp = document.getElementById('floatingPrintBtn');
       if (fp) fp.hidden = true;
     });
   }
 
-  container.addEventListener("keydown", (e) => {
+  container.addEventListener('keydown', (e) => {
     const tabs = [...container.querySelectorAll('button[role="tab"]')];
-    const active = container.querySelector("button.active");
+    const active = container.querySelector('button.active');
     const i = tabs.indexOf(active);
-    if (e.key === "ArrowRight") tabs[i + 1]?.click();
-    if (e.key === "ArrowLeft") tabs[i - 1]?.click();
+    if (e.key === 'ArrowRight') tabs[i + 1]?.click();
+    if (e.key === 'ArrowLeft') tabs[i - 1]?.click();
   });
 }
 
 function setActiveTab(container, newActive) {
   container.querySelectorAll('button[role="tab"]').forEach((b) => {
-    b.classList.remove("active");
-    b.setAttribute("aria-selected", "false");
+    b.classList.remove('active');
+    b.setAttribute('aria-selected', 'false');
     b.tabIndex = -1;
   });
-  newActive.classList.add("active");
-  newActive.setAttribute("aria-selected", "true");
+  newActive.classList.add('active');
+  newActive.setAttribute('aria-selected', 'true');
   newActive.tabIndex = 0;
 }
 
 export async function loadTeamAnswers(verticalChoice) {
   if (els.mcSection) els.mcSection.hidden = true;
 
-  setStatus(
-    `Loading team answers for ${verticalChoice?.name ?? "selected vertical"}…`,
-  );
+  setStatus(`Loading team answers for ${verticalChoice?.name ?? 'selected vertical'}…`);
 
   // Set the dynamic print header for vertical reports
-  if (verticalChoice?.name) {
-    setPrintHeader(`${verticalChoice.name}`);
-  } else {
-    setPrintHeader("Vertical Report");
-  }
+  if (verticalChoice?.name) setPrintHeader(`${verticalChoice.name}`);
+  else setPrintHeader('Vertical Report');
 
   const wsId = getWorkspaceId();
+
   const base = {
     Request: {
       ObjectType: { GUID: GUIDS.ANSWER_OBJ },
       fields: [
-        { GUID: GUIDS.QUESTION_ID }, // [0]
-        { GUID: GUIDS.SINGLE_CHOICE }, // [1]
-        { GUID: GUIDS.DAT }, // [2]
-        { GUID: GUIDS.RESPONDENT_REF }, // [3]
-        { GUID: GUIDS.YES_NO }, // [4]
-        { GUID: GUIDS.QUESTION_TEXT }, // [5]
+        { GUID: GUIDS.QUESTION_ID },     // [0]
+        { GUID: GUIDS.SINGLE_CHOICE },   // [1]
+        { GUID: GUIDS.DAT },             // [2]
+        { GUID: GUIDS.RESPONDENT_REF },  // [3]
+        { GUID: GUIDS.YES_NO },          // [4]
+        { GUID: GUIDS.QUESTION_TEXT },   // [5]
       ],
       condition:
         `('Question::Answer Type' == CHOICE ${GUIDS.TYPE_SINGLE} ` +
         `OR 'Question::Answer Type' == CHOICE ${GUIDS.TYPE_YESNO}) ` +
         `AND 'Question::Verticals' == CHOICE ${verticalChoice.guid}`,
-      sorts: [{ Direction: "Ascending", FieldIdentifier: { GUID: GUIDS.DAT } }],
+      sorts: [{ Direction: 'Ascending', FieldIdentifier: { GUID: GUIDS.DAT } }],
     },
   };
 
   const rows = await fetchAllQuerySlim(wsId, base, 1000);
 
-  if (els.multiList) els.multiList.innerHTML = "";
+  if (els.multiList) els.multiList.innerHTML = '';
 
-  const periods = [
-    ...new Set(rows.map((r) => r.Values?.[2]?.Name).filter(Boolean)),
-  ];
-  periods.sort(compareDatNames); // ✅ ensure chronological ordering
+  // ---- Tiny improvement: determine DAT periods from DAT objects, then filter to those present in rows
+  const allDats = await getAllDatNames();
+  const present = new Set(rows.map((r) => r.Values?.[2]?.Name).filter(Boolean));
+  const periods = allDats.filter((d) => present.has(d));
+
+  // Defensive: ensure sorted even if upstream changes
+  periods.sort(compareDatNames);
+
   const earliest = periods[0];
   const latest = periods[periods.length - 1];
 
@@ -1232,11 +1254,11 @@ export async function loadTeamAnswers(verticalChoice) {
 
   replaceChartData(periods, totals);
 
+  // Strengths & Training Needs section (latest DAT)
   renderTeamStrengths(rows, { topN: 5, minResponses: 2 });
 
-  import("./teamMultiChoiceAgg.js").then((m) =>
-    m.loadTeamMultiChoiceAnswers(verticalChoice.guid),
-  );
+  // Load Multi-choice aggregation for team/vertical
+  import('./teamMultiChoiceAgg.js').then((m) => m.loadTeamMultiChoiceAnswers(verticalChoice.guid));
 
   const changes = [];
   Object.keys(series).forEach((qId) => {
@@ -1283,7 +1305,7 @@ export async function loadTeamAnswers(verticalChoice) {
   setStatus(`Team chart updated. (${rows.length.toLocaleString()} records)`);
 
   // SHOW floating print button
-  const fp = document.getElementById("floatingPrintBtn");
+  const fp = document.getElementById('floatingPrintBtn');
   if (fp) fp.hidden = false;
 }
 
